@@ -1059,11 +1059,11 @@ function toggleDark() {
 
 // ====== MORNING BRIEF DATA ======
 const MORNING_DATA = {
-  date: '2026-05-13',
-  hora_exportacao: '10:55',
-  totals: {"total_abertos": 208, "criados_hoje": 2, "pos17h_ontem": 13, "retroativos": 193},
-  produtos: {"ProstaFense": 20, "GlucoRecover": 33, "NervoLyn": 27, "MaroBrain": 15, "VisiumPro, GlucoRecover": 2, "AudiLeaf": 25, "VigorLong": 9, "VisiumPro": 25, "BoosterXT": 1, "ReduBurn": 6, "Lipovive": 5, "BoosterXT, TestoFence, VigorLong": 1, "LumaLift": 1, "GlucoRecover, Natur Lipo, LipoVive": 1, "Slimpic": 1},
-  agents: {"Heitor": {"total_abertos": 51, "criados_hoje": 0, "pos17h_ontem": 3, "retroativos": 48, "status": {"Waiting on Customer": 27, "Open": 23, "Pending": 1}, "prioridade": {"Medium": 41, "High": 10}}, "Natália": {"total_abertos": 51, "criados_hoje": 1, "pos17h_ontem": 3, "retroativos": 47, "status": {"Open": 27, "Waiting on Customer": 20, "Pending": 2, "Waiting on Third Party": 2}, "prioridade": {"Medium": 36, "High": 15}}, "Neythan": {"total_abertos": 55, "criados_hoje": 0, "pos17h_ontem": 3, "retroativos": 52, "status": {"Waiting on Customer": 26, "Open": 24, "Pending": 5}, "prioridade": {"Medium": 47, "High": 7, "Low": 1}}, "Yasmin": {"total_abertos": 51, "criados_hoje": 1, "pos17h_ontem": 4, "retroativos": 46, "status": {"Waiting on Customer": 34, "Open": 14, "Pending": 3}, "prioridade": {"Medium": 40, "High": 8, "Low": 2, "Urgent": 1}}}
+  date: '2026-05-14',
+  hora_exportacao: '11:05',
+  totals: {"total_abertos": 123, "criados_hoje": 3, "pos17h_ontem": 18, "retroativos": 102},
+  produtos: {"GlucoRecover": 20, "AudiLeaf": 16, "NervoLyn": 15, "ProstaFense": 13, "VisiumPro": 13, "MaroBrain": 7, "Lipovive": 5, "VigorLong": 4, "ReduBurn": 4, "BoosterXT": 2, "VisiumPro, GlucoRecover": 1},
+  agents: {"Heitor": {"total_abertos": 37, "criados_hoje": 0, "pos17h_ontem": 8, "retroativos": 29, "status": {"Open": 19, "Waiting on Customer": 17, "Pending": 1}, "prioridade": {"Medium": 31, "High": 6}}, "Natália": {"total_abertos": 26, "criados_hoje": 1, "pos17h_ontem": 0, "retroativos": 25, "status": {"Open": 17, "Waiting on Customer": 7, "Pending": 2}, "prioridade": {"Medium": 17, "High": 8, "Low": 1}}, "Neythan": {"total_abertos": 30, "criados_hoje": 1, "pos17h_ontem": 5, "retroativos": 24, "status": {"Open": 15, "Waiting on Customer": 15}, "prioridade": {"Medium": 23, "High": 7}}, "Yasmin": {"total_abertos": 30, "criados_hoje": 1, "pos17h_ontem": 5, "retroativos": 24, "status": {"Waiting on Customer": 19, "Open": 10, "Pending": 1}, "prioridade": {"Medium": 25, "High": 3, "Low": 2}}}
 };
 
 function renderMorning() {
@@ -1434,15 +1434,19 @@ function barList(obj, colorMap, maxOverride) {
 function renderFD() {
   const isWeekend = isWeekendDate(fdPeriod);
   const banner = document.getElementById('weekendBanner');
+
   if (isWeekend) {
     banner.style.display = 'flex';
     banner.querySelector('span').textContent = '🚫 O time não trabalha aos fins de semana — sem dados para este dia.';
   } else if (fdPeriod !== '_custom' && !DATA_FD[fdPeriod]) {
-    banner.style.display = 'flex';
-    banner.querySelector('span').textContent = '📋 Dados de hoje ainda não foram atualizados — exporte os CSVs do Freshdesk e suba na pasta data/. Mostrando último dia disponível.';
-    // fallback to last available day
+    // Fallback to last available day
     const lastDay = Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().at(-1);
     if (lastDay) fdPeriod = lastDay;
+    const [y,mo,d] = (lastDay||'').split('-');
+    const lastLabel = lastDay ? `${d}/${mo}` : '—';
+    banner.style.display = 'flex';
+    banner.querySelector('span').innerHTML =
+      `📋 <strong>Hoje (${fmtShort(getHoje())}) ainda sem dados</strong> — aguardando exportação do Freshdesk no final do dia. Exibindo o último dia disponível: <strong>${lastLabel}</strong>.`;
   } else {
     banner.style.display = 'none';
   }
