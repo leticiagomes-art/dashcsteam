@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐯 Tiger CS — Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --border: #e5e5ea;
+  --border2: #d1d1d6;
+  --text: #1c1c1e;
+  --muted: #8e8e93;
+  --muted2: #636366;
+  --green: #34c759;
+  --green-bg: #f0fdf4;
+  --red: #ff3b30;
+  --red-bg: #fff5f5;
+  --blue: #007aff;
+  --blue-bg: #f0f8ff;
+  --orange: #ff9500;
+  --orange-bg: #fff8f0;
+  --purple: #af52de;
+  --heitor: #007aff;
+  --natalia: #ff9500;
+  --neythan: #34c759;
+  --yasmin: #af52de;
+}
+.dark {
+  --bg: #1c1c1e;
+  --surface: #2c2c2e;
+  --border: #3a3a3c;
+  --border2: #48484a;
+  --text: #f2f2f7;
+  --muted: #8e8e93;
+  --muted2: #aeaeb2;
+  --green-bg: #1a3a25;
+  --red-bg: #3a1c1c;
+  --blue-bg: #1c2a3a;
+  --orange-bg: #3a2a1c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+}
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.tiger-logo {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: linear-gradient(135deg, #ff9500, #ff3b30);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+}
+.topbar-title { font-size: 15px; font-weight: 700; }
+.topbar-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.dark-btn {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 14px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  color: var(--text); transition: all .15s;
+}
+.dark-btn:hover { background: var(--border); }
+
+/* TABS */
+.tabs-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 20px; gap: 0; overflow-x: auto;
+}
+.tab {
+  padding: 12px 18px;
+  font-size: 13px; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer; border: none; background: none;
+  border-bottom: 2px solid transparent;
+  transition: all .15s; white-space: nowrap;
+  display: flex; align-items: center; gap: 6px;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--blue); border-bottom-color: var(--blue); }
+.tab-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* PERIOD SELECTOR */
+.period-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 20px;
+  display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
+}
+.period-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; }
+.period-group { display: flex; gap: 4px; flex-wrap: wrap; }
+.pbtn {
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--muted2); cursor: pointer; transition: all .15s;
+}
+.pbtn:hover { border-color: var(--blue); color: var(--blue); }
+.pbtn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+.period-sep { width: 1px; height: 20px; background: var(--border); margin: 0 4px; align-self: center; }
+
+/* CONTENT */
+.content { padding: 20px; max-width: 1300px; margin: 0 auto; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* KPI ROW */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media(max-width:1100px){ .kpi-grid { grid-template-columns: repeat(3,1fr); } }
+@media(max-width:700px){ .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border-top: 3px solid var(--kpi-color, var(--blue));
+}
+.kpi-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+.kpi-value { font-size: 28px; font-weight: 700; color: var(--kpi-color, var(--text)); line-height: 1; }
+.kpi-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+
+/* AGENT CARDS */
+.agent-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 16px;
+}
+@media(max-width:900px){ .agent-row { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:500px){ .agent-row { grid-template-columns: 1fr; } }
+
+.agent-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--ac);
+}
+.agent-name { font-size: 15px; font-weight: 700; color: var(--ac); }
+.agent-role { font-size: 10px; color: var(--muted); margin-bottom: 10px; }
+.ag-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.ag-stat-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.ag-stat-val { font-size: 18px; font-weight: 700; line-height: 1.1; }
+.ag-stat-pct { font-size: 11px; font-weight: 600; }
+.ag-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; border-top: 1px solid var(--border); padding-top: 8px; }
+.ag-b-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .3px; }
+.ag-b-val { font-size: 13px; font-weight: 600; }
+
+/* SECTION CARD */
+.sec-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+  height: 100%;
+}
+.sec-title {
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;
+}
+.sec-title-badge {
+  font-size: 10px; background: var(--bg);
+  border: 1px solid var(--border); border-radius: 5px;
+  padding: 2px 8px; color: var(--muted2); font-weight: 500;
+  text-transform: none; letter-spacing: 0;
+}
+
+/* GRID LAYOUTS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+@media(max-width:900px){ .grid-2,.grid-3,.grid-4 { grid-template-columns: 1fr; } }
+
+/* RETENTION BARS */
+.ret-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0; border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.ret-row:last-child { border-bottom: none; }
+.ret-label { flex: 0 0 240px; color: var(--text); font-size: 12px; }
+.ret-bar-wrap { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.ret-bar { height: 100%; border-radius: 3px; }
+.ret-count { min-width: 80px; text-align: right; font-size: 11px; color: var(--muted2); font-weight: 500; }
+
+/* MOTIVO BARS */
+.motivo-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.motivo-row:last-child { border-bottom: none; }
+.motivo-label { flex: 1; font-size: 12px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.motivo-bar-wrap { width: 120px; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.motivo-bar { height: 100%; border-radius: 3px; background: var(--purple); }
+.motivo-count { min-width: 65px; text-align: right; font-size: 11px; color: var(--muted2); font-weight: 500; }
+
+/* PRODUCT BARS */
+.prod-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--border);
+}
+.prod-row:last-child { border-bottom: none; }
+.prod-name { flex: 0 0 110px; font-size: 12px; font-weight: 500; color: var(--text); }
+.prod-bar-wrap { flex: 1; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.prod-bar { height: 100%; border-radius: 3px; background: var(--blue); }
+.prod-count { min-width: 70px; text-align: right; font-size: 11px; color: var(--muted2); font-weight: 500; }
+
+/* LADDER */
+.ladder-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 0; border-bottom: 1px solid var(--border);
+}
+.ladder-row:last-child { border-bottom: none; }
+.ladder-num {
+  width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700;
+}
+.ladder-label { flex: 1; font-size: 11px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ladder-bar-wrap { width: 80px; height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+.ladder-bar { height: 100%; border-radius: 3px; }
+.ladder-count { min-width: 28px; text-align: right; font-size: 11px; color: var(--muted2); font-weight: 600; }
+
+/* TABLE */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  text-align: left; padding: 8px 12px;
+  font-size: 10px; text-transform: uppercase; letter-spacing: .4px;
+  color: var(--muted); font-weight: 600;
+  border-bottom: 1px solid var(--border); background: var(--bg);
+}
+.data-table td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+.data-table tr:last-child td { border-bottom: none; font-weight: 700; background: var(--bg); }
+.data-table tr:hover:not(:last-child) td { background: var(--bg); }
+.badge {
+  display: inline-block; padding: 2px 7px; border-radius: 5px;
+  font-size: 10px; font-weight: 700;
+}
+.green-badge { background: var(--green-bg); color: var(--green); }
+.red-badge { background: var(--red-bg); color: var(--red); }
+.blue-badge { background: var(--blue-bg); color: var(--blue); }
+
+/* CHART */
+.chart-wrap { position: relative; height: 220px; }
+.chart-wrap-sm { position: relative; height: 170px; }
+
+.dark #weekendBanner { background:#2a2010;border-color:#4a3a10;color:#d4a030; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* CALENDAR BUTTON */
+.cal-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--blue); background: var(--blue-bg);
+  color: var(--blue); cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.cal-btn:hover { background: var(--blue); color: #fff; }
+.cal-btn.has-range { background: var(--blue); color: #fff; }
+
+/* CALENDAR FLOATING PANEL */
+.cal-overlay {
+  display: none; position: fixed; inset: 0;
+  z-index: 999; background: transparent;
+}
+.cal-overlay.open { display: block; }
+.cal-panel {
+  position: absolute;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  padding: 0;
+  width: 320px;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+  animation: calIn .15s ease;
+}
+@keyframes calIn { from { opacity:0; transform:translateY(-6px) scale(.97); } to { opacity:1; transform:none; } }
+.cal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-nav { display: flex; align-items: center; gap: 6px; }
+.cal-nav-btn {
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--text); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .12s;
+}
+.cal-nav-btn:hover { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cal-month-label { font-size: 14px; font-weight: 700; color: var(--text); min-width: 140px; text-align: center; }
+.cal-mode-btns { display: flex; gap: 4px; padding: 8px 16px; border-bottom: 1px solid var(--border); }
+.cal-mode-btn {
+  flex: 1; padding: 5px; border-radius: 6px; font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border); background: var(--bg);
+  color: var(--muted2); cursor: pointer; transition: all .12s;
+}
+.cal-mode-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cal-grid-wrap { padding: 10px 16px 8px; }
+.cal-dow {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  margin-bottom: 4px;
+}
+.cal-dow span {
+  text-align: center; font-size: 10px; font-weight: 600;
+  color: var(--muted); padding: 4px 0;
+}
+.cal-days { display: grid; grid-template-columns: repeat(7,1fr); gap: 2px; }
+.cal-day {
+  text-align: center; padding: 7px 2px; border-radius: 7px;
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  color: var(--text); transition: all .1s; position: relative;
+  user-select: none;
+}
+.cal-day:hover:not(.empty):not(.disabled) { background: var(--blue); color: #fff; }
+.cal-day.has-data::after {
+  content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%; background: var(--blue);
+}
+.cal-day.selected, .cal-day.range-start, .cal-day.range-end {
+  background: var(--blue); color: #fff;
+}
+.cal-day.range-start::after, .cal-day.range-end::after { background: #fff; }
+.cal-day.in-range {
+  background: var(--blue-bg); color: var(--blue); border-radius: 0;
+}
+.cal-day.range-start { border-radius: 7px 0 0 7px; }
+.cal-day.range-end { border-radius: 0 7px 7px 0; }
+.cal-day.range-start.range-end { border-radius: 7px; }
+.cal-day.disabled { color: var(--border2); cursor: default; }
+.cal-day.empty { cursor: default; }
+.cal-day.weekend {
+  color: var(--border2);
+  cursor: not-allowed;
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+.cal-day.today { font-weight: 800; }
+.cal-day.today:not(.selected):not(.in-range) { color: var(--blue); }
+.cal-footer {
+  padding: 10px 16px 14px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.cal-range-label { font-size: 11px; color: var(--muted2); flex: 1; }
+.cal-range-label strong { color: var(--text); font-weight: 600; }
+.cal-apply {
+  padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 600;
+  border: none; background: var(--blue); color: #fff; cursor: pointer;
+  transition: opacity .12s;
+}
+.cal-apply:hover { opacity: .85; }
+.cal-clear {
+  padding: 6px 10px; border-radius: 7px; font-size: 12px; font-weight: 500;
+  border: 1px solid var(--border); background: var(--bg); color: var(--muted2);
+  cursor: pointer; transition: all .12s;
+}
+.cal-clear:hover { border-color: var(--red); color: var(--red); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="tiger-logo">🐯</div>
+    <div>
+      <div class="topbar-title">Tiger Offers — Dashboard CS</div>
+      <div class="topbar-sub">Dados: 16/04–13/05/2026 · Freshdesk</div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="dark-btn" onclick="toggleDark()">🌙 Modo Escuro</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab" id="tabMorning" onclick="switchView('morning')">
+    <div class="tab-dot" style="background:#ff9500"></div>
+    🌅 Morning Brief
+  </button>
+  <button class="tab" id="tabFD" onclick="switchView('freshdesk')">
+    <div class="tab-dot" style="background:#007aff"></div>
+    🎫 Freshdesk (a partir de 05/05)
+  </button>
+  <button class="tab" id="tabForms" onclick="switchView('forms')">
+    <div class="tab-dot" style="background:#34c759"></div>
+    📋 Formulário (até 08/05)
+  </button>
+  <button class="tab" id="tabPerf" onclick="switchView('performance')">
+    <div class="tab-dot" style="background:#ff3b30"></div>
+    📊 Performance (6 meses)
+  </button>
+</div>
+
+<!-- PERIOD SELECTOR -->
+<div class="period-bar" id="periodBar">
+  <span class="period-label">Período — CS</span>
+  <div class="period-group" id="periodBtns">
+    <button class="pbtn" id="btnHoje" onclick="setPeriod(getHoje(), this)">Hoje</button>
+    <button class="pbtn" id="btnOntem" onclick="setPeriod(getOntem(), this)">Ontem</button>
+    <div class="period-sep"></div>
+    <button class="cal-btn" id="calTrigger" onclick="toggleCal(event)">
+      📅 <span id="calBtnLabel">Personalizado</span>
+    </button>
+  </div>
+</div>
+
+<!-- CALENDAR OVERLAY -->
+<div class="cal-overlay" id="calOverlay" onclick="closeCal(event)">
+  <div class="cal-panel" id="calPanel">
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="calNav(-1)">‹</button>
+      <div class="cal-month-label" id="calMonthLabel"></div>
+      <button class="cal-nav-btn" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-mode-btns">
+      <button class="cal-mode-btn active" id="modeDay" onclick="setCalMode('day')">Dia único</button>
+      <button class="cal-mode-btn" id="modeRange" onclick="setCalMode('range')">Intervalo</button>
+    </div>
+    <div class="cal-grid-wrap">
+      <div class="cal-dow">
+        <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+      </div>
+      <div class="cal-days" id="calDays"></div>
+    </div>
+    <div class="cal-footer">
+      <div class="cal-range-label" id="calRangeLabel">Selecione uma data</div>
+      <button class="cal-clear" onclick="clearCal()">Limpar</button>
+      <button class="cal-apply" onclick="applyCal()">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKEND / NO DATA BANNER -->
+<div id="weekendBanner" style="display:none;align-items:center;gap:10px;background:#fff8e6;border-bottom:1px solid #ffe0a0;padding:10px 20px;font-size:13px;color:#92620a;">
+  <span></span>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- ===== MORNING BRIEF VIEW ===== -->
+  <div id="view-morning" style="display:none">
+
+    <!-- header info bar -->
+    <div id="morning-infobar" style="margin-bottom:16px;padding:10px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div style="font-size:13px;color:var(--text)">
+        🌅 <strong>Morning Brief</strong> — fila de entrada do dia
+      </div>
+      <div id="morning-meta" style="font-size:11px;color:var(--muted)"></div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid" id="morning-kpis" style="margin-bottom:16px"></div>
+
+    <!-- Agent queue cards -->
+    <div class="agent-row" id="morning-agents" style="margin-bottom:16px"></div>
+
+    <!-- Breakdown -->
+    <div class="grid-2" id="morning-breakdown" style="margin-bottom:16px"></div>
+
+    <!-- Products -->
+    <div class="sec-card" id="morning-produtos" style="margin-bottom:16px"></div>
+
+  </div>
+
+  <!-- ===== FORMS VIEW ===== -->
+  <div id="view-forms" style="display:none">
+    <div class="kpi-grid" id="kpiGrid"></div>
+    <div class="agent-row" id="agentCards"></div>
+    <div class="grid-2" id="retMotivoGrid"></div>
+    <div class="grid-2" id="prodLadderGrid"></div>
+    <div class="sec-card" style="margin-bottom:16px" id="tableSection"></div>
+  </div>
+
+  <!-- ===== PERFORMANCE VIEW ===== -->
+  <div id="view-performance" style="display:none">
+    <div style="margin-bottom:16px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted);">
+      📅 Dados do <strong style="color:var(--text)">Agent Performance Report — últimos 6 meses</strong> · Gerado em 12/05/2026 · Inclui todos os tickets respondidos por agente (independente de atribuição)
+    </div>
+
+    <!-- KPIs gerais -->
+    <div class="kpi-grid" style="margin-bottom:16px">
+      <div class="kpi-card" style="--kpi-color:#007aff"><div class="kpi-label">Tickets Atribuídos</div><div class="kpi-value">5.820</div><div class="kpi-sub">últimos 6 meses</div></div>
+      <div class="kpi-card" style="--kpi-color:#34c759"><div class="kpi-label">Resolvidos</div><div class="kpi-value">3.770</div><div class="kpi-sub">64,8% do total</div></div>
+      <div class="kpi-card" style="--kpi-color:#ff9500"><div class="kpi-label">Respostas Enviadas</div><div class="kpi-value">3.065</div><div class="kpi-sub">todas as interações</div></div>
+      <div class="kpi-card" style="--kpi-color:#af52de"><div class="kpi-label">Reabertos</div><div class="kpi-value">297</div><div class="kpi-sub">5,1% dos resolvidos</div></div>
+      <div class="kpi-card" style="--kpi-color:#ff3b30"><div class="kpi-label">Violações SLA Resolução</div><div class="kpi-value">2.818</div><div class="kpi-sub">do total</div></div>
+      <div class="kpi-card" style="--kpi-color:#5ac8fa"><div class="kpi-label">Violações FCR</div><div class="kpi-value">805</div><div class="kpi-sub">não resolvido 1º contato</div></div>
+    </div>
+
+    <!-- Agent cards performance -->
+    <div class="agent-row" id="perf-agentCards" style="margin-bottom:16px"></div>
+
+    <!-- SLA + FCR -->
+    <div class="grid-2" id="perf-slaGrid" style="margin-bottom:16px"></div>
+
+    <!-- Handling time + Violações -->
+    <div class="grid-2" id="perf-violGrid" style="margin-bottom:16px"></div>
+
+    <!-- Tabela completa -->
+    <div class="sec-card" id="perf-table" style="margin-bottom:16px"></div>
+  </div>
+  <div id="view-freshdesk" style="display:block">
+
+    <!-- KPI ROW -->
+    <div class="kpi-grid" id="fd-kpiGrid"></div>
+
+    <!-- AGENT CARDS -->
+    <div class="agent-row" id="fd-agentCards"></div>
+
+    <!-- ROW 1: Status + Tipo/Prioridade -->
+    <div class="grid-2" id="fd-row1"></div>
+
+    <!-- ROW 2: Produtos + Motivos -->
+    <div class="grid-2" id="fd-row2"></div>
+
+    <!-- ROW 3: Interações + Resultado/Tier -->
+    <div class="grid-2" id="fd-row3"></div>
+
+    <!-- TABLE -->
+    <div class="sec-card" style="margin-bottom:16px" id="fd-tableSection"></div>
+
+  </div>
+
+</div>
+
+<script>
+// ============ ALL DATA ============
+const DATA = {"2026-05-05": {"Heitor": {"tickets": 1, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Natália": {"tickets": 3, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Neythan": {"tickets": 0, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "cancelamentos": 0, "taxa": 0}, "Yasmin": {"tickets": 2, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "_totals": {"tickets": 6, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "cancelamentos": 0, "taxa": 0}, "_motivos": {"Venda": 1, "Entrega": 1, "Cobrança": 1}, "_degraus": {}, "_produtos": {"MaroBrain": 1, "ProstaFense": 1}}, "2026-05-06": {"Heitor": {"tickets": 8, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Natália": {"tickets": 9, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Neythan": {"tickets": 3, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Yasmin": {"tickets": 7, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "_totals": {"tickets": 27, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "cancelamentos": 0, "taxa": 0}, "_motivos": {"Cobrança": 5, "Entrega": 4, "Aconselhamento Médico": 4, "Não classificado": 1, "Venda": 1}, "_degraus": {"1 - Sondagem": 2}, "_produtos": {"GlucoRecover": 7, "NervoLyn": 3, "AudiLeaf": 1, "VisiumPro": 1, "LipoBliss": 1, "Prostafense": 1, "Lipovive": 1}}, "2026-05-07": {"Heitor": {"tickets": 3, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Natália": {"tickets": 2, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Neythan": {"tickets": 1, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Yasmin": {"tickets": 14, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 1, "taxa": 0.0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "_totals": {"tickets": 20, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "cancelamentos": 1, "taxa": 0.0}, "_motivos": {"Aconselhamento Médico": 2, "Cobrança": 1, "Entrega": 8, "Discordou de Upsell": 1, "Venda": 1, "Checkout": 1}, "_degraus": {"1 - Sondagem": 3}, "_produtos": {"ReduBurn": 2, "ProstaFense": 2, "MaroBrain": 1, "VisiumPro": 4, "Lipovive": 4, "Visium Pro": 1, "NervoLyn": 1, "Oatzem": 1}}, "2026-05-08": {"Heitor": {"tickets": 3, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Natália": {"tickets": 2, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Neythan": {"tickets": 6, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "Yasmin": {"tickets": 11, "ret_total": 0, "ret_parcial": 0, "reembolsado": 0, "cancelamentos": 0, "taxa": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0}, "_totals": {"tickets": 22, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "cancelamentos": 0, "taxa": 0}, "_motivos": {"Checkout": 1, "Entrega": 5, "Não classificado": 1, "Aconselhamento Médico": 1, "Cobrança": 4, "Venda": 4}, "_degraus": {"1 - Sondagem": 6}, "_produtos": {"MaroBrain": 3, "GlucoRecover": 3, "ProstaFense": 2, "Lipovive": 1, "VigorLong": 2, "AudiLeaf": 6, "ReduBurn": 1, "VisiumPro": 1}}, "total": {"Heitor": {"tickets": 15, "cancelamentos": 0, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "taxa": 0}, "Natália": {"tickets": 16, "cancelamentos": 0, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "taxa": 0}, "Neythan": {"tickets": 10, "cancelamentos": 0, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "taxa": 0}, "Yasmin": {"tickets": 34, "cancelamentos": 1, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "taxa": 0.0}, "_totals": {"tickets": 75, "cancelamentos": 1, "ret_total": 0, "ret_parcial": 0, "gateway_hg": 0, "proposta": 0, "negado": 0, "gateway_tiger": 0, "taxa": 0.0}, "_motivos": {"Venda": 7, "Entrega": 18, "Cobrança": 11, "Aconselhamento Médico": 7, "Não classificado": 2, "Discordou de Upsell": 1, "Checkout": 2}, "_degraus": {"1 - Sondagem": 11}, "_produtos": {"MaroBrain": 5, "ProstaFense": 5, "GlucoRecover": 10, "NervoLyn": 4, "AudiLeaf": 7, "VisiumPro": 6, "LipoBliss": 1, "Prostafense": 1, "Lipovive": 6, "ReduBurn": 3, "Visium Pro": 1, "Oatzem": 1, "VigorLong": 2}}};
+
+const DATA_FD = {"2026-04-16": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1}, "valor_total": 195.02, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Natália": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Neythan": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1, "GlucoRecover": 1, "NervoLyn": 1}, "valor_total": 1418.23, "motivos": {"Cobrança": 1, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 2}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 4}, "_produtos": {"NervoLyn": 2, "ProstaFense": 1, "GlucoRecover": 1}, "_motivos": {"Cobrança": 2, "Entrega": 1}, "_resultado": {}, "_tier": {"MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 3}, "_totals": {"tickets_criados": 4, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 1613.25, "interacoes_agente": 0}}, "2026-04-18": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"High": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 311.64, "motivos": {"Venda": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 317.52, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"High": 1, "Medium": 2}, "_produtos": {"MaroBrain": 3}, "_motivos": {"Venda": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 2}, "_totals": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 629.16, "interacoes_agente": 0}}, "2026-04-19": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 318.26, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 232.2, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 2}, "_produtos": {"GlucoRecover": 1, "MaroBrain": 1}, "_motivos": {"Entrega": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 550.46, "interacoes_agente": 0}}, "2026-04-20": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 334.7, "motivos": {}, "resultado": {}, "tier": {"LOW - até $150": 1}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro, GlucoRecover": 1}, "valor_total": 188.96, "motivos": {}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Urgent": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"Lipovive": 1}, "valor_total": 317.52, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 4, "Urgent": 1}, "_produtos": {"GlucoRecover": 1, "VisiumPro": 1, "VisiumPro, GlucoRecover": 1, "Lipovive": 1}, "_motivos": {}, "_resultado": {}, "_tier": {"LOW - até $150": 1, "MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 5, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 841.18, "interacoes_agente": 0}}, "2026-04-21": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 1}, "valor_total": 482.63, "motivos": {"Chargeback": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"BoosterXT, TestoFence, VigorLong": 1}, "valor_total": 1099.73, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 2}, "_produtos": {"AudiLeaf": 1, "BoosterXT, TestoFence, VigorLong": 1}, "_motivos": {"Chargeback": 1, "Cobrança": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 2}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 1582.36, "interacoes_agente": 0}}, "2026-04-22": {"Heitor": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1, "ReduBurn": 1}, "valor_total": 906.17, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1}, "valor_total": 294.0, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VigorLong": 1}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Yasmin": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1, "VisiumPro": 1}, "valor_total": 778.36, "motivos": {"Aconselhamento Médico": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 2}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 6}, "_produtos": {"NervoLyn": 2, "ReduBurn": 1, "VisiumPro": 2, "VigorLong": 1}, "_motivos": {"Cobrança": 1, "Entrega": 1, "Aconselhamento Médico": 1}, "_resultado": {}, "_tier": {"MEDIUM - $151 a $250": 3, "HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 6, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 1978.53, "interacoes_agente": 0}}, "2026-04-23": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1}, "valor_total": 234.09, "motivos": {}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 606.34, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 2}, "_produtos": {"NervoLyn": 1, "MaroBrain": 1}, "_motivos": {"Entrega": 1}, "_resultado": {}, "_tier": {"MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 840.43, "interacoes_agente": 0}}, "2026-04-24": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"High": 2, "Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1, "GlucoRecover": 1, "AudiLeaf": 1}, "valor_total": 529.84, "motivos": {}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"High": 2, "Medium": 1}, "_produtos": {"VisiumPro": 1, "GlucoRecover": 1, "AudiLeaf": 1}, "_motivos": {}, "_resultado": {}, "_tier": {"MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 529.84, "interacoes_agente": 0}}, "2026-04-25": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 7433.08, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"High": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Neythan": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 1, "High": 1}, "_produtos": {"MaroBrain": 1}, "_motivos": {}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 7433.08, "interacoes_agente": 0}}, "2026-04-26": {"Heitor": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 2, "AudiLeaf": 1}, "valor_total": 9043.74, "motivos": {"Aconselhamento Médico": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1}, "valor_total": 6073.32, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 6953.65, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 1123.33, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 6}, "_produtos": {"GlucoRecover": 4, "AudiLeaf": 1, "ProstaFense": 1}, "_motivos": {"Aconselhamento Médico": 1, "Cobrança": 3}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 5, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 6, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 23194.04, "interacoes_agente": 0}}, "2026-04-27": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 2, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "status": {"Waiting on Customer": 2}, "tipo": {"Question": 2}, "prioridade": {"High": 2}, "interacoes_agente": 2, "interacoes_cliente": 2, "produtos": {"VigorLong": 1, "VisiumPro": 1}, "valor_total": 1201.01, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 0.0, "motivos": {"Chargeback": 1, "Venda": 1}, "resultado": {}, "tier": {}, "upsell": 0}, "Yasmin": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1, "AudiLeaf": 1}, "valor_total": 510.0, "motivos": {"Entrega": 1, "Não classificado": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "upsell": 0}, "_status": {"Waiting on Customer": 2}, "_tipo": {"Question": 2}, "_prioridade": {"High": 2, "Medium": 4}, "_produtos": {"VigorLong": 1, "VisiumPro": 1, "GlucoRecover": 1, "MaroBrain": 1, "AudiLeaf": 1}, "_motivos": {"Chargeback": 1, "Venda": 1, "Entrega": 1, "Não classificado": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 6, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "valor_total": 1711.01, "interacoes_agente": 2}}, "2026-04-28": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 5, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 5}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 2, "VisiumPro": 1, "ReduBurn": 1}, "valor_total": 2203.39, "motivos": {"Aconselhamento Médico": 1, "Cobrança": 1, "Entrega": 1, "Chargeback": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 2}, "Neythan": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 3}, "valor_total": 1268.6, "motivos": {"Entrega": 1, "Aconselhamento Médico": 1, "Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "upsell": 2}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 8}, "_produtos": {"AudiLeaf": 5, "VisiumPro": 1, "ReduBurn": 1}, "_motivos": {"Aconselhamento Médico": 2, "Cobrança": 2, "Entrega": 2, "Chargeback": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 5, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 8, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 3471.99, "interacoes_agente": 0}}, "2026-04-29": {"Heitor": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {}, "valor_total": 1064.64, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 0, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "status": {"Waiting on Third Party": 1}, "tipo": {"Question": 1}, "prioridade": {"High": 1}, "interacoes_agente": 3, "interacoes_cliente": 2, "produtos": {}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1, "MaroBrain": 1}, "valor_total": 1186.17, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 2}, "Yasmin": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1, "VisiumPro": 2}, "valor_total": 1123.57, "motivos": {"Atraso na Entrega": 1, "Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "_status": {"Waiting on Third Party": 1}, "_tipo": {"Question": 1}, "_prioridade": {"Medium": 7, "High": 1}, "_produtos": {"ProstaFense": 1, "MaroBrain": 1, "NervoLyn": 1, "VisiumPro": 2}, "_motivos": {"Entrega": 1, "Atraso na Entrega": 1, "Cobrança": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 5, "MEDIUM - $151 a $250": 2}, "_totals": {"tickets_criados": 7, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "valor_total": 3374.38, "interacoes_agente": 3}}, "2026-04-30": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {}, "valor_total": 572.88, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {}, "valor_total": 534.05, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 1}, "valor_total": 594.0, "motivos": {"Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 3}, "_produtos": {"GlucoRecover": 1}, "_motivos": {"Entrega": 1, "Checkout": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 3}, "_totals": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 1700.93, "interacoes_agente": 0}}, "2026-05-01": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 1}, "valor_total": 477.0, "motivos": {}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1, "GlucoRecover": 1, "ProstaFense": 1}, "valor_total": 1285.05, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 2}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1, "MaroBrain": 1}, "valor_total": 804.13, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1}, "valor_total": 235.82, "motivos": {}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 7}, "_produtos": {"AudiLeaf": 1, "VisiumPro": 2, "GlucoRecover": 1, "ProstaFense": 1, "MaroBrain": 1, "NervoLyn": 1}, "_motivos": {"Entrega": 1, "Cobrança": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 5, "MEDIUM - $151 a $250": 2}, "_totals": {"tickets_criados": 7, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 2802.0, "interacoes_agente": 0}}, "2026-05-02": {"Heitor": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 1}, "valor_total": 237.06, "motivos": {}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Natália": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Neythan": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1}, "valor_total": 528.0, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 2}, "_produtos": {"MaroBrain": 1, "ProstaFense": 1}, "_motivos": {"Entrega": 1}, "_resultado": {}, "_tier": {"MEDIUM - $151 a $250": 1, "HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 765.06, "interacoes_agente": 0}}, "2026-05-03": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VigorLong": 1}, "valor_total": 0.0, "motivos": {"Não classificado": 1}, "resultado": {}, "tier": {}, "upsell": 0}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1}, "valor_total": 528.0, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 2}, "_produtos": {"VigorLong": 1, "ProstaFense": 1}, "_motivos": {"Não classificado": 1, "Cobrança": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 1}, "_totals": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 528.0, "interacoes_agente": 0}}, "2026-05-04": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "status": {"Waiting on Customer": 1}, "tipo": {"Refund": 1}, "prioridade": {"High": 1}, "interacoes_agente": 9, "interacoes_cliente": 7, "produtos": {}, "valor_total": 0.0, "motivos": {}, "resultado": {}, "tier": {}, "upsell": 0}, "Natália": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ReduBurn": 1}, "valor_total": 669.92, "motivos": {"Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {}, "valor_total": 572.22, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "_status": {"Waiting on Customer": 1}, "_tipo": {"Refund": 1}, "_prioridade": {"High": 1, "Medium": 3}, "_produtos": {"ReduBurn": 1}, "_motivos": {"Checkout": 1, "Entrega": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 3, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "valor_total": 1242.14, "interacoes_agente": 9}}, "2026-05-05": {"Heitor": {"tickets_criados": 3, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2, "High": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"GlucoRecover": 2, "NervoLyn": 1}, "valor_total": 482.63, "motivos": {"Cobrança": 2, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 2, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "status": {"Waiting on Customer": 1}, "tipo": {"Refund": 1}, "prioridade": {"Medium": 1}, "interacoes_agente": 3, "interacoes_cliente": 3, "produtos": {"Lipovive": 1, "GlucoRecover": 1}, "valor_total": 321.72, "motivos": {"Venda": 1, "Aconselhamento Médico": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 1}, "valor_total": 1151.06, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 2}, "Yasmin": {"tickets_criados": 7, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "status": {"Waiting on Customer": 1}, "tipo": {}, "prioridade": {"High": 1}, "interacoes_agente": 1, "interacoes_cliente": 1, "produtos": {"GlucoRecover": 1, "VigorLong": 1, "ProstaFense": 2, "VisiumPro": 2}, "valor_total": 2615.46, "motivos": {"Cobrança": 3, "Venda": 2, "Entrega": 1, "Discordou de Upsell": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 5, "MEDIUM - $151 a $250": 1}, "upsell": 4}, "_status": {"Waiting on Customer": 2}, "_tipo": {"Refund": 1}, "_prioridade": {"Medium": 5, "High": 2}, "_produtos": {"GlucoRecover": 4, "NervoLyn": 1, "Lipovive": 1, "AudiLeaf": 1, "VigorLong": 1, "ProstaFense": 2, "VisiumPro": 2}, "_motivos": {"Cobrança": 5, "Entrega": 3, "Venda": 3, "Aconselhamento Médico": 1, "Discordou de Upsell": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 9, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 14, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "valor_total": 4570.87, "interacoes_agente": 4}}, "2026-05-06": {"Heitor": {"tickets_criados": 3, "tickets_trabalhados": 4, "fechados": 0, "abertos": 4, "status": {"Waiting on Customer": 4}, "tipo": {"Refund": 2, "Question": 1}, "prioridade": {"Medium": 2, "High": 2}, "interacoes_agente": 5, "interacoes_cliente": 5, "produtos": {"ReduBurn": 1}, "valor_total": 559.68, "motivos": {"Entrega": 1, "Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 8, "tickets_trabalhados": 5, "fechados": 0, "abertos": 5, "status": {"Waiting on Customer": 5}, "tipo": {"Refund": 4}, "prioridade": {"Medium": 3, "High": 2}, "interacoes_agente": 6, "interacoes_cliente": 5, "produtos": {"AudiLeaf": 1, "VisiumPro": 2, "ProstaFense": 1, "Lipovive": 1, "MaroBrain": 1, "NervoLyn": 1, "VigorLong": 1}, "valor_total": 2276.08, "motivos": {"Venda": 1, "Entrega": 1, "Não classificado": 1, "Aconselhamento Médico": 1, "Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 6, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VisiumPro": 1}, "valor_total": 550.31, "motivos": {"Venda": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 5, "tickets_trabalhados": 4, "fechados": 0, "abertos": 4, "status": {"Waiting on Customer": 4}, "tipo": {"Question": 3, "Refund": 1}, "prioridade": {"High": 3, "Urgent": 1}, "interacoes_agente": 27, "interacoes_cliente": 30, "produtos": {"ProstaFense": 1, "GlucoRecover": 1, "AudiLeaf": 1, "NervoLyn": 1, "VisiumPro": 1}, "valor_total": 2478.42, "motivos": {"Venda": 2, "Cobrança": 1, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 5}, "upsell": 2}, "_status": {"Waiting on Customer": 13}, "_tipo": {"Refund": 7, "Question": 4}, "_prioridade": {"Medium": 7, "High": 7, "Urgent": 1}, "_produtos": {"ReduBurn": 1, "AudiLeaf": 2, "VisiumPro": 4, "ProstaFense": 2, "Lipovive": 1, "MaroBrain": 1, "NervoLyn": 2, "VigorLong": 1, "GlucoRecover": 1}, "_motivos": {"Entrega": 3, "Cobrança": 3, "Venda": 4, "Não classificado": 1, "Aconselhamento Médico": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 13, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 18, "tickets_trabalhados": 13, "fechados": 0, "abertos": 13, "valor_total": 5864.49, "interacoes_agente": 38}}, "2026-05-07": {"Heitor": {"tickets_criados": 3, "tickets_trabalhados": 3, "fechados": 0, "abertos": 3, "status": {"Waiting on Customer": 3}, "tipo": {"Refund": 3}, "prioridade": {"Medium": 3}, "interacoes_agente": 5, "interacoes_cliente": 5, "produtos": {"GlucoRecover": 2, "MaroBrain": 1}, "valor_total": 1514.82, "motivos": {"Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "status": {"Waiting on Customer": 2}, "tipo": {"Refund": 2}, "prioridade": {"Medium": 2}, "interacoes_agente": 2, "interacoes_cliente": 2, "produtos": {"AudiLeaf": 1}, "valor_total": 0.0, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {}, "upsell": 0}, "Neythan": {"tickets_criados": 2, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "status": {"Waiting on Customer": 1, "Pending": 1}, "tipo": {"Refund": 1, "Question": 1}, "prioridade": {"Medium": 1, "High": 1}, "interacoes_agente": 1, "interacoes_cliente": 2, "produtos": {"VisiumPro": 1}, "valor_total": 0.0, "motivos": {"Entrega": 2}, "resultado": {}, "tier": {}, "upsell": 0}, "Yasmin": {"tickets_criados": 3, "tickets_trabalhados": 4, "fechados": 0, "abertos": 4, "status": {"Waiting on Customer": 4}, "tipo": {"Refund": 4}, "prioridade": {"Medium": 4}, "interacoes_agente": 7, "interacoes_cliente": 8, "produtos": {"AudiLeaf": 3}, "valor_total": 463.32, "motivos": {"Entrega": 1, "Cobrança": 1, "Venda": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 2}, "upsell": 0}, "_status": {"Waiting on Customer": 10, "Pending": 1}, "_tipo": {"Refund": 10, "Question": 1}, "_prioridade": {"Medium": 10, "High": 1}, "_produtos": {"GlucoRecover": 2, "MaroBrain": 1, "AudiLeaf": 4, "VisiumPro": 1}, "_motivos": {"Checkout": 1, "Cobrança": 2, "Entrega": 3, "Venda": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 3, "MEDIUM - $151 a $250": 2}, "_totals": {"tickets_criados": 9, "tickets_trabalhados": 11, "fechados": 0, "abertos": 11, "valor_total": 1978.14, "interacoes_agente": 15}}, "2026-05-08": {"Heitor": {"tickets_criados": 4, "tickets_trabalhados": 4, "fechados": 0, "abertos": 4, "status": {"Waiting on Customer": 4}, "tipo": {"Refund": 4}, "prioridade": {"Medium": 4}, "interacoes_agente": 5, "interacoes_cliente": 5, "produtos": {"VigorLong": 1, "VisiumPro": 1, "MaroBrain": 1}, "valor_total": 982.49, "motivos": {"Cobrança": 1, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2, "MEDIUM - $151 a $250": 1}, "upsell": 1}, "Natália": {"tickets_criados": 2, "tickets_trabalhados": 3, "fechados": 0, "abertos": 3, "status": {"Waiting on Customer": 2, "Pending": 1}, "tipo": {"Refund": 2, "Question": 1}, "prioridade": {"Medium": 2, "High": 1}, "interacoes_agente": 7, "interacoes_cliente": 7, "produtos": {"Lipovive": 1, "AudiLeaf": 1}, "valor_total": 199.27, "motivos": {"Não classificado": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 4, "tickets_trabalhados": 5, "fechados": 0, "abertos": 5, "status": {"Waiting on Customer": 5}, "tipo": {"Refund": 5}, "prioridade": {"Medium": 5}, "interacoes_agente": 12, "interacoes_cliente": 11, "produtos": {"ProstaFense": 2, "NervoLyn": 1, "GlucoRecover": 1}, "valor_total": 1672.44, "motivos": {"Cobrança": 2, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 3}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 12, "fechados": 0, "abertos": 12, "status": {"Waiting on Customer": 11, "Pending": 1}, "tipo": {"Refund": 11, "Question": 1}, "prioridade": {"Medium": 11, "High": 1}, "interacoes_agente": 41, "interacoes_cliente": 39, "produtos": {"GlucoRecover": 1}, "valor_total": 564.96, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {"Waiting on Customer": 22, "Pending": 2}, "_tipo": {"Refund": 22, "Question": 2}, "_prioridade": {"Medium": 22, "High": 2}, "_produtos": {"VigorLong": 1, "VisiumPro": 1, "MaroBrain": 1, "Lipovive": 1, "AudiLeaf": 1, "ProstaFense": 2, "NervoLyn": 1, "GlucoRecover": 2}, "_motivos": {"Cobrança": 4, "Entrega": 2, "Não classificado": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 6, "MEDIUM - $151 a $250": 2}, "_totals": {"tickets_criados": 11, "tickets_trabalhados": 24, "fechados": 0, "abertos": 24, "valor_total": 3419.16, "interacoes_agente": 65}}, "2026-05-09": {"Heitor": {"tickets_criados": 0, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "interacoes_agente": 0, "interacoes_cliente": 0, "valor_total": 0.0, "upsell": 0, "status": {}, "tipo": {}, "prioridade": {}, "produtos": {}, "motivos": {}, "resultado": {}, "tier": {}}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1}, "valor_total": 681.74, "motivos": {"Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "status": {"Open": 2}, "tipo": {"Refund": 2}, "prioridade": {"Medium": 2}, "interacoes_agente": 0, "interacoes_cliente": 2, "produtos": {"NervoLyn": 1}, "valor_total": 602.69, "motivos": {"Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"ProstaFense": 1}, "valor_total": 605.43, "motivos": {"Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "_status": {"Open": 2}, "_tipo": {"Refund": 2}, "_prioridade": {"Medium": 4}, "_produtos": {"NervoLyn": 2, "ProstaFense": 1}, "_motivos": {"Checkout": 2, "Cobrança": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 3}, "_totals": {"tickets_criados": 3, "tickets_trabalhados": 2, "fechados": 0, "abertos": 2, "valor_total": 1889.86, "interacoes_agente": 0}}, "2026-05-10": {"Heitor": {"tickets_criados": 4, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 3, "High": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"MaroBrain": 2, "NervoLyn": 1, "AudiLeaf": 1}, "valor_total": 773.66, "motivos": {"Cobrança": 3, "Discordou de Upsell": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 1}, "Natália": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"AudiLeaf": 1}, "valor_total": 563.65, "motivos": {"Discordou de Upsell": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Neythan": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"High": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"VigorLong": 1}, "valor_total": 0.0, "motivos": {"Entrega": 1}, "resultado": {}, "tier": {}, "upsell": 0}, "Yasmin": {"tickets_criados": 1, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "status": {}, "tipo": {}, "prioridade": {"Medium": 1}, "interacoes_agente": 0, "interacoes_cliente": 0, "produtos": {"NervoLyn": 1}, "valor_total": 316.05, "motivos": {"Arrependimento": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 0}, "_status": {}, "_tipo": {}, "_prioridade": {"Medium": 5, "High": 2}, "_produtos": {"MaroBrain": 2, "NervoLyn": 2, "AudiLeaf": 2, "VigorLong": 1}, "_motivos": {"Cobrança": 3, "Discordou de Upsell": 2, "Entrega": 1, "Arrependimento": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 4}, "_totals": {"tickets_criados": 7, "tickets_trabalhados": 0, "fechados": 0, "abertos": 0, "valor_total": 1653.36, "interacoes_agente": 0}}, "2026-05-11": {"Heitor": {"tickets_criados": 8, "tickets_trabalhados": 8, "fechados": 0, "abertos": 8, "status": {"Waiting on Customer": 7, "Pending": 1}, "tipo": {"Refund": 6, "Question": 2}, "prioridade": {"Medium": 6, "High": 2}, "interacoes_agente": 19, "interacoes_cliente": 20, "produtos": {"NervoLyn": 1, "AudiLeaf": 1, "ProstaFense": 1, "VisiumPro": 1, "ReduBurn": 1}, "valor_total": 893.15, "motivos": {"Entrega": 3, "Checkout": 1, "Cobrança": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 1}, "Natália": {"tickets_criados": 5, "tickets_trabalhados": 4, "fechados": 0, "abertos": 4, "status": {"Waiting on Customer": 4}, "tipo": {"Refund": 3, "Question": 1}, "prioridade": {"Medium": 2, "High": 2}, "interacoes_agente": 6, "interacoes_cliente": 6, "produtos": {"AudiLeaf": 1, "GlucoRecover": 2, "NervoLyn": 1}, "valor_total": 892.32, "motivos": {"Entrega": 1, "Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 1}, "Neythan": {"tickets_criados": 12, "tickets_trabalhados": 14, "fechados": 0, "abertos": 14, "status": {"Waiting on Customer": 12, "Open": 2}, "tipo": {"Refund": 12, "Question": 2}, "prioridade": {"Medium": 12, "High": 2}, "interacoes_agente": 17, "interacoes_cliente": 20, "produtos": {"VigorLong": 1, "NervoLyn": 1, "VisiumPro": 1, "GlucoRecover": 3}, "valor_total": 481.5, "motivos": {"Entrega": 2, "Venda": 1, "Não classificado": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 1}, "upsell": 1}, "Yasmin": {"tickets_criados": 6, "tickets_trabalhados": 1, "fechados": 0, "abertos": 1, "status": {"Waiting on Customer": 1}, "tipo": {"Refund": 1}, "prioridade": {"Medium": 1}, "interacoes_agente": 2, "interacoes_cliente": 1, "produtos": {"VisiumPro": 2, "GlucoRecover": 1, "NervoLyn": 1, "LumaLift": 1}, "valor_total": 1914.37, "motivos": {"Venda": 3, "Aconselhamento Médico": 1, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 4}, "upsell": 3}, "_status": {"Waiting on Customer": 24, "Pending": 1, "Open": 2}, "_tipo": {"Refund": 22, "Question": 5}, "_prioridade": {"Medium": 21, "High": 6}, "_produtos": {"NervoLyn": 4, "AudiLeaf": 2, "ProstaFense": 1, "VisiumPro": 4, "ReduBurn": 1, "GlucoRecover": 6, "VigorLong": 1, "LumaLift": 1}, "_motivos": {"Entrega": 7, "Checkout": 2, "Cobrança": 1, "Venda": 4, "Não classificado": 1, "Aconselhamento Médico": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 9}, "_totals": {"tickets_criados": 31, "tickets_trabalhados": 27, "fechados": 0, "abertos": 27, "valor_total": 4181.34, "interacoes_agente": 44}}, "2026-05-12": {"Heitor": {"tickets_criados": 12, "tickets_trabalhados": 26, "fechados": 0, "abertos": 26, "status": {"Open": 18, "Waiting on Customer": 8}, "tipo": {"Refund": 23, "Question": 3}, "prioridade": {"Medium": 23, "High": 3}, "interacoes_agente": 48, "interacoes_cliente": 67, "produtos": {"ProstaFense": 4, "NervoLyn": 3, "AudiLeaf": 1, "Lipovive": 1, "VisiumPro": 1, "GlucoRecover": 1}, "valor_total": 1542.25, "motivos": {"Cobrança": 3, "Checkout": 2, "Entrega": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 3}, "Natália": {"tickets_criados": 7, "tickets_trabalhados": 26, "fechados": 0, "abertos": 26, "status": {"Open": 20, "Waiting on Customer": 4, "Waiting on Third Party": 1, "Pending": 1}, "tipo": {"Refund": 21, "Question": 4}, "prioridade": {"Medium": 21, "High": 5}, "interacoes_agente": 62, "interacoes_cliente": 83, "produtos": {"VisiumPro": 1, "GlucoRecover": 1, "AudiLeaf": 2, "NervoLyn": 1}, "valor_total": 222.16, "motivos": {"Cobrança": 2, "Entrega": 1, "Não classificado": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 1}, "upsell": 0}, "Neythan": {"tickets_criados": 10, "tickets_trabalhados": 31, "fechados": 0, "abertos": 31, "status": {"Open": 19, "Waiting on Customer": 8, "Pending": 4}, "tipo": {"Refund": 26, "Question": 4}, "prioridade": {"Medium": 26, "High": 4, "Low": 1}, "interacoes_agente": 60, "interacoes_cliente": 88, "produtos": {"NervoLyn": 2, "GlucoRecover": 2, "BoosterXT": 1, "ReduBurn": 1, "ProstaFense": 1, "VigorLong": 1}, "valor_total": 1129.92, "motivos": {"Checkout": 2, "Cobrança": 2, "Venda": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}, "upsell": 2}, "Yasmin": {"tickets_criados": 11, "tickets_trabalhados": 24, "fechados": 0, "abertos": 24, "status": {"Waiting on Customer": 13, "Open": 9, "Pending": 2}, "tipo": {"Refund": 22, "Question": 2}, "prioridade": {"Medium": 21, "High": 2, "Low": 1}, "interacoes_agente": 50, "interacoes_cliente": 58, "produtos": {"NervoLyn": 2, "GlucoRecover": 2, "VisiumPro": 1, "GlucoRecover, Natur Lipo, LipoVive": 1, "ProstaFense": 1, "VisiumPro, GlucoRecover": 1, "Slimpic": 1}, "valor_total": 1473.77, "motivos": {"Entrega": 4, "Discordou de Upsell": 1, "Não classificado": 1, "Venda": 1, "Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 2}, "_status": {"Open": 66, "Waiting on Customer": 33, "Waiting on Third Party": 1, "Pending": 7}, "_tipo": {"Refund": 92, "Question": 13}, "_prioridade": {"Medium": 91, "High": 14, "Low": 2}, "_produtos": {"ProstaFense": 6, "NervoLyn": 8, "AudiLeaf": 3, "Lipovive": 1, "VisiumPro": 3, "GlucoRecover": 6, "BoosterXT": 1, "ReduBurn": 1, "VigorLong": 1, "GlucoRecover, Natur Lipo, LipoVive": 1, "VisiumPro, GlucoRecover": 1, "Slimpic": 1}, "_motivos": {"Cobrança": 7, "Checkout": 5, "Entrega": 6, "Não classificado": 2, "Venda": 2, "Discordou de Upsell": 1}, "_resultado": {}, "_tier": {"HIGH - acima de $250": 8, "MEDIUM - $151 a $250": 1}, "_totals": {"tickets_criados": 40, "tickets_trabalhados": 107, "fechados": 0, "abertos": 107, "valor_total": 4368.1, "interacoes_agente": 220}}, "2026-05-13": {"Heitor": {"tickets_criados": 8, "tickets_trabalhados": 24, "fechados": 3, "abertos": 5, "status": {"Open": 3, "Resolved": 2, "Waiting on Customer": 2, "Closed": 1}, "tipo": {"Question": 4, "Refund": 4}, "prioridade": {"High": 4, "Medium": 4}, "interacoes_agente": 24, "interacoes_cliente": 10, "produtos": {"ProstaFense": 3, "NervoLyn": 1, "GlucoRecover": 2}, "plataforma": {"BuyGoods": 7}, "valor_total": 0.0, "motivos": {"Entrega": 3, "Cobrança": 3}, "resultado": {}, "tier": {}, "upsell": 0, "resolvidos_atividade": 8, "reabertos_atividade": 2, "reatribuidos_atividade": 0, "notas_privadas": 13}, "Natália": {"tickets_criados": 10, "tickets_trabalhados": 24, "fechados": 0, "abertos": 10, "status": {"Open": 8, "Waiting on Customer": 2}, "tipo": {"Refund": 6, "Question": 4}, "prioridade": {"Medium": 6, "High": 4}, "interacoes_agente": 24, "interacoes_cliente": 12, "produtos": {"GlucoRecover": 1, "ReduBurn": 1, "ProstaFense": 2, "VisiumPro": 1, "AudiLeaf": 1, "MaroBrain": 1}, "plataforma": {"BuyGoods": 8}, "valor_total": 1787.6, "motivos": {"Venda": 2, "Comprou no Concorrente": 1, "Cobrança": 1, "Chargeback": 1, "Checkout": 1, "Não classificado": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 3}, "upsell": 3, "resolvidos_atividade": 10, "reabertos_atividade": 1, "reatribuidos_atividade": 2, "notas_privadas": 4}, "Neythan": {"tickets_criados": 7, "tickets_trabalhados": 27, "fechados": 4, "abertos": 3, "status": {"Resolved": 3, "Open": 2, "Closed": 1, "Waiting on Customer": 1}, "tipo": {"Refund": 4, "Question": 3}, "prioridade": {"Medium": 4, "High": 3}, "interacoes_agente": 27, "interacoes_cliente": 9, "produtos": {"AudiLeaf": 1, "Lipovive": 1, "ProstaFense": 1, "LumaLift": 1, "ReduBurn": 1, "VisiumPro": 1}, "plataforma": {"BuyGoods": 6}, "valor_total": 345.29, "motivos": {"Cobrança": 2, "Entrega": 1, "Venda": 1, "Devolução": 1}, "resultado": {"Retido": 1}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}, "upsell": 0, "resolvidos_atividade": 19, "reabertos_atividade": 7, "reatribuidos_atividade": 2, "notas_privadas": 0}, "Yasmin": {"tickets_criados": 11, "tickets_trabalhados": 33, "fechados": 2, "abertos": 9, "status": {"Waiting on Customer": 8, "Closed": 2, "Open": 1}, "tipo": {"Refund": 8, "Question": 2}, "prioridade": {"Medium": 8, "High": 2, "Low": 1}, "interacoes_agente": 33, "interacoes_cliente": 14, "produtos": {"VisiumPro": 3, "ProstaFense": 1, "VigorLong": 1, "GlucoRecover": 2, "Lipovive": 1, "BoosterXT": 1}, "plataforma": {"BuyGoods": 7}, "valor_total": 3396.09, "motivos": {"Cobrança": 3, "Outro": 1, "Entrega": 1, "Venda": 1, "Arrependimento": 1, "Resultados x Expectativa": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 6}, "upsell": 6, "resolvidos_atividade": 19, "reabertos_atividade": 4, "reatribuidos_atividade": 0, "notas_privadas": 24}, "_totals": {"tickets_criados": 36, "tickets_trabalhados": 108, "fechados": 9, "abertos": 27, "valor_total": 5528.98, "interacoes_agente": 108, "resolvidos_atividade": 56, "reabertos_atividade": 14, "notas_privadas": 41}, "_status": {"Open": 14, "Resolved": 5, "Waiting on Customer": 13, "Closed": 4}, "_tipo": {"Question": 13, "Refund": 22}, "_prioridade": {"High": 13, "Medium": 22, "Low": 1}, "_produtos": {"ProstaFense": 7, "NervoLyn": 1, "GlucoRecover": 5, "ReduBurn": 2, "VisiumPro": 5, "AudiLeaf": 2, "MaroBrain": 1, "Lipovive": 2, "LumaLift": 1, "VigorLong": 1, "BoosterXT": 1}, "_motivos": {"Entrega": 5, "Cobrança": 9, "Venda": 4, "Comprou no Concorrente": 1, "Chargeback": 1, "Checkout": 1, "Não classificado": 1, "Devolução": 1, "Outro": 1, "Arrependimento": 1, "Resultados x Expectativa": 1}, "_resultado": {"Retido": 1}, "_tier": {"HIGH - acima de $250": 10, "MEDIUM - $151 a $250": 1}}, "total": {"Heitor": {"tickets_criados": 69, "tickets_trabalhados": 96, "fechados": 17, "abertos": 51, "interacoes_agente": 141, "interacoes_cliente": 119, "valor_total": 27012.970000000005, "upsell": 16, "status": {"Waiting on Customer": 29, "Pending": 1, "Open": 21, "Resolved": 2, "Closed": 1}, "tipo": {"Refund": 43, "Question": 10}, "prioridade": {"Medium": 60, "High": 15}, "produtos": {"NervoLyn": 9, "MaroBrain": 7, "GlucoRecover": 10, "ReduBurn": 3, "AudiLeaf": 5, "VigorLong": 1, "VisiumPro": 3, "ProstaFense": 8, "Lipovive": 1}, "motivos": {"Cobrança": 16, "Aconselhamento Médico": 1, "Entrega": 12, "Checkout": 4, "Discordou de Upsell": 1}, "resultado": {}, "tier": {"MEDIUM - $151 a $250": 6, "LOW - até $150": 1, "HIGH - acima de $250": 20}}, "Natália": {"tickets_criados": 67, "tickets_trabalhados": 87, "fechados": 12, "abertos": 54, "interacoes_agente": 134, "interacoes_cliente": 122, "valor_total": 20599.109999999997, "upsell": 13, "status": {"Waiting on Customer": 22, "Waiting on Third Party": 2, "Pending": 2, "Open": 28}, "tipo": {"Question": 13, "Refund": 39}, "prioridade": {"Medium": 57, "High": 20}, "produtos": {"MaroBrain": 3, "GlucoRecover": 8, "VisiumPro": 10, "NervoLyn": 5, "AudiLeaf": 11, "ProstaFense": 5, "VigorLong": 2, "ReduBurn": 3, "Lipovive": 3}, "motivos": {"Venda": 5, "Entrega": 6, "Cobrança": 7, "Aconselhamento Médico": 3, "Chargeback": 2, "Checkout": 4, "Não classificado": 4, "Discordou de Upsell": 1, "Comprou no Concorrente": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 28, "MEDIUM - $151 a $250": 6}}, "Neythan": {"tickets_criados": 72, "tickets_trabalhados": 109, "fechados": 21, "abertos": 57, "interacoes_agente": 145, "interacoes_cliente": 132, "valor_total": 19357.519999999997, "upsell": 21, "status": {"Waiting on Customer": 27, "Pending": 5, "Open": 25, "Resolved": 3, "Closed": 1}, "tipo": {"Refund": 50, "Question": 10}, "prioridade": {"Medium": 75, "High": 11, "Low": 1}, "produtos": {"ProstaFense": 6, "GlucoRecover": 9, "NervoLyn": 6, "MaroBrain": 4, "VisiumPro, GlucoRecover": 1, "AudiLeaf": 6, "VigorLong": 5, "VisiumPro": 5, "BoosterXT": 1, "ReduBurn": 2, "Lipovive": 1, "LumaLift": 1}, "motivos": {"Cobrança": 10, "Entrega": 12, "Chargeback": 2, "Venda": 5, "Aconselhamento Médico": 1, "Não classificado": 2, "Checkout": 3, "Devolução": 1}, "resultado": {"Retido": 1}, "tier": {"HIGH - acima de $250": 23, "MEDIUM - $151 a $250": 5}}, "Yasmin": {"tickets_criados": 79, "tickets_trabalhados": 117, "fechados": 33, "abertos": 55, "interacoes_agente": 199, "interacoes_cliente": 151, "valor_total": 21272.54, "upsell": 27, "status": {"Waiting on Customer": 42, "Pending": 3, "Open": 10, "Closed": 2}, "tipo": {"Question": 8, "Refund": 47}, "prioridade": {"Urgent": 2, "Medium": 61, "High": 9, "Low": 2}, "produtos": {"Lipovive": 2, "BoosterXT, TestoFence, VigorLong": 1, "NervoLyn": 8, "VisiumPro": 12, "MaroBrain": 2, "GlucoRecover": 10, "AudiLeaf": 5, "ProstaFense": 8, "VigorLong": 2, "LumaLift": 1, "GlucoRecover, Natur Lipo, LipoVive": 1, "VisiumPro, GlucoRecover": 1, "Slimpic": 1, "BoosterXT": 1}, "motivos": {"Cobrança": 14, "Aconselhamento Médico": 2, "Entrega": 12, "Não classificado": 2, "Atraso na Entrega": 1, "Checkout": 2, "Venda": 10, "Discordou de Upsell": 2, "Arrependimento": 2, "Outro": 1, "Resultados x Expectativa": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 36, "MEDIUM - $151 a $250": 8}}, "_totals": {"tickets_criados": 287, "tickets_trabalhados": 409, "fechados": 83, "abertos": 217, "valor_total": 88242.14, "interacoes_agente": 619}, "_status": {"Waiting on Customer": 120, "Waiting on Third Party": 2, "Pending": 11, "Open": 84, "Resolved": 5, "Closed": 4}, "_tipo": {"Question": 41, "Refund": 179}, "_prioridade": {"Medium": 253, "High": 55, "Urgent": 2, "Low": 3}, "_produtos": {"NervoLyn": 28, "ProstaFense": 27, "GlucoRecover": 37, "MaroBrain": 16, "VisiumPro": 30, "VisiumPro, GlucoRecover": 2, "Lipovive": 7, "AudiLeaf": 27, "BoosterXT, TestoFence, VigorLong": 1, "ReduBurn": 8, "VigorLong": 10, "LumaLift": 2, "BoosterXT": 2, "GlucoRecover, Natur Lipo, LipoVive": 1, "Slimpic": 1}, "_motivos": {"Cobrança": 47, "Entrega": 42, "Venda": 20, "Chargeback": 4, "Aconselhamento Médico": 7, "Não classificado": 8, "Atraso na Entrega": 1, "Checkout": 13, "Discordou de Upsell": 4, "Arrependimento": 2, "Comprou no Concorrente": 1, "Devolução": 1, "Outro": 1, "Resultados x Expectativa": 1}, "_resultado": {"Retido": 1}, "_tier": {"MEDIUM - $151 a $250": 25, "HIGH - acima de $250": 107, "LOW - até $150": 1}}, "2026-05-14": {"Heitor": {"tickets_criados": 8, "tickets_trabalhados": 26, "fechados": 7, "abertos": 15, "interacoes_agente": 26, "interacoes_cliente": 0, "valor_total": 1891.24, "upsell": 3, "resolvidos_atividade": 14, "reabertos_atividade": 2, "notas_privadas": 9, "status": {"Waiting on Customer": 10, "Open": 5, "Closed": 4, "Resolved": 3}, "tipo": {"Refund": 15, "Question": 7}, "prioridade": {"Medium": 15, "High": 7}, "produtos": {"VisiumPro": 2, "GlucoRecover": 2, "ProstaFense": 1}, "motivos": {"Cobrança": 2, "Discordou de Upsell": 1, "Checkout": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 4}}, "Natália": {"tickets_criados": 6, "tickets_trabalhados": 19, "fechados": 3, "abertos": 11, "interacoes_agente": 19, "interacoes_cliente": 0, "valor_total": 1034.77, "upsell": 2, "resolvidos_atividade": 12, "reabertos_atividade": 3, "notas_privadas": 7, "status": {"Waiting on Customer": 6, "Open": 4, "Closed": 2, "Resolved": 1, "Pending": 1}, "tipo": {"Refund": 7, "Question": 6, "Sales": 1}, "prioridade": {"Medium": 7, "High": 6, "Low": 1}, "produtos": {"NervoLyn": 2, "GlucoRecover": 1, "ReduBurn": 1, "ProstaFense": 1, "AudiLeaf": 1}, "motivos": {"Dúvida": 1, "Entrega": 1, "Não classificado": 1}, "resultado": {}, "tier": {"HIGH - acima de $250": 2}}, "Neythan": {"tickets_criados": 8, "tickets_trabalhados": 28, "fechados": 5, "abertos": 8, "interacoes_agente": 28, "interacoes_cliente": 0, "valor_total": 533.22, "upsell": 0, "resolvidos_atividade": 17, "reabertos_atividade": 8, "notas_privadas": 0, "status": {"Resolved": 5, "Open": 4, "Waiting on Customer": 3, "Pending": 1}, "tipo": {"Refund": 8, "Question": 5}, "prioridade": {"Medium": 8, "High": 5}, "produtos": {"VisiumPro": 2, "NervoLyn": 1, "ProstaFense": 2, "Retina Clear": 1, "ProstaBlend": 1}, "motivos": {"Entrega": 2}, "resultado": {"Reembolsado": 1}, "tier": {"HIGH - acima de $250": 1, "MEDIUM - $151 a $250": 1}}, "Yasmin": {"tickets_criados": 19, "tickets_trabalhados": 38, "fechados": 13, "abertos": 17, "interacoes_agente": 38, "interacoes_cliente": 0, "valor_total": 2197.5, "upsell": 2, "resolvidos_atividade": 31, "reabertos_atividade": 8, "notas_privadas": 17, "status": {"Waiting on Customer": 17, "Closed": 12, "Resolved": 1}, "tipo": {"Refund": 22, "Question": 7}, "prioridade": {"Medium": 22, "High": 7, "Low": 1}, "produtos": {"AudiLeaf": 1, "ProstaFense": 5, "Lipovive": 2, "MaroBrain": 1, "NervoLyn": 2, "GlucoRecover": 1, "VigorLong": 1}, "motivos": {"Entrega": 4, "Cobrança": 3, "Resultados x Expectativa": 2, "Checkout": 1, "Venda": 1, "Aconselhamento Médico": 1, "Não classificado": 1}, "resultado": {"Retido": 2, "Reembolsado": 1}, "tier": {"MEDIUM - $151 a $250": 4, "HIGH - acima de $250": 3}}, "_totals": {"tickets_criados": 41, "tickets_trabalhados": 111, "fechados": 28, "abertos": 51, "valor_total": 5656.73, "interacoes_agente": 111, "resolvidos_atividade": 74, "reabertos_atividade": 21, "notas_privadas": 33}, "_status": {"Waiting on Customer": 36, "Open": 13, "Closed": 18, "Resolved": 10, "Pending": 2}, "_tipo": {"Refund": 52, "Question": 25, "Sales": 1}, "_prioridade": {"Medium": 52, "High": 25, "Low": 2}, "_produtos": {"VisiumPro": 4, "GlucoRecover": 4, "ProstaFense": 9, "NervoLyn": 5, "ReduBurn": 1, "AudiLeaf": 2, "Retina Clear": 1, "ProstaBlend": 1, "Lipovive": 2, "MaroBrain": 1, "VigorLong": 1}, "_motivos": {"Cobrança": 5, "Discordou de Upsell": 1, "Checkout": 2, "Dúvida": 1, "Entrega": 7, "Não classificado": 2, "Resultados x Expectativa": 2, "Venda": 1, "Aconselhamento Médico": 1}, "_resultado": {"Reembolsado": 2, "Retido": 2}, "_tier": {"HIGH - acima de $250": 10, "MEDIUM - $151 a $250": 5}}};
+
+// ============ STATE ============
+let currentPeriod = 'total';
+let currentView = 'freshdesk';
+let fdPeriod = 'total';
+let calMode = 'day';
+let calViewYear = 2026;
+let calViewMonth = 3;
+let calSelStart = null;
+let calSelEnd = null;
+let calPickingEnd = false;
+
+// ============ CONSTANTS ============
+const AGENT_CFG = {
+  Heitor:  { color: '#007aff', role: 'CS Tiger Offers' },
+  Natália: { color: '#ff9500', role: 'CS Tiger Offers' },
+  Neythan: { color: '#34c759', role: 'CS Tiger Offers' },
+  Yasmin:  { color: '#af52de', role: 'CS Tiger Offers' },
+};
+const AGENTS = ['Heitor','Natália','Neythan','Yasmin'];
+const LADDER_COLORS = ['#007aff','#34c759','#ff9500','#af52de','#ff3b30','#5ac8fa','#ff2d55'];
+const AVAILABLE_DATES = new Set([
+  ...Object.keys(DATA).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)),
+  ...Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k))
+]);
+const FD_AVAILABLE = new Set(Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)));
+const STATUS_COLORS = {'Closed':'#34c759','Resolved':'#30d158','Open':'#ff3b30','Waiting on Customer':'#ff9500','Pending':'#af52de','Waiting on Third Party':'#5ac8fa'};
+
+// ============ FUNCTIONS ============
+// ============ ALL DATA ============
+
+
+
+
+
+
+
+
+
+
+
+// ============ CALENDAR ============
+
+
+
+
+
+
+
+
+
+function toggleCal(e) {
+  e.stopPropagation();
+  const overlay = document.getElementById('calOverlay');
+  const panel = document.getElementById('calPanel');
+  const trigger = document.getElementById('calTrigger');
+  if (overlay.classList.contains('open')) { closeCal(); return; }
+
+  // position panel below trigger
+  const rect = trigger.getBoundingClientRect();
+  panel.style.top = (rect.bottom + 6 + window.scrollY) + 'px';
+  const left = Math.min(rect.left, window.innerWidth - 330);
+  panel.style.left = Math.max(8, left) + 'px';
+
+  overlay.classList.add('open');
+  renderCalGrid();
+}
+
+function closeCal(e) {
+  if (e && e.target !== document.getElementById('calOverlay')) return;
+  document.getElementById('calOverlay').classList.remove('open');
+}
+
+function setCalMode(mode) {
+  calMode = mode;
+  calSelStart = null; calSelEnd = null; calPickingEnd = false;
+  document.getElementById('modeDay').classList.toggle('active', mode === 'day');
+  document.getElementById('modeRange').classList.toggle('active', mode === 'range');
+  updateCalFooter();
+  renderCalGrid();
+}
+
+function calNav(dir) {
+  calViewMonth += dir;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0)  { calViewMonth = 11; calViewYear--; }
+  renderCalGrid();
+}
+
+function renderCalGrid() {
+  const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  document.getElementById('calMonthLabel').textContent = `${months[calViewMonth]} ${calViewYear}`;
+
+  const firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+  const grid = document.getElementById('calDays');
+  let html = '';
+
+  // empty cells
+  for (let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dow = new Date(calViewYear, calViewMonth, d).getDay(); // 0=Sun, 6=Sat
+    const isWeekend = dow === 0 || dow === 6;
+    const hasData = AVAILABLE_DATES.has(dateStr);
+    const disabled = !hasData || isWeekend;
+
+    let cls = 'cal-day';
+    if (isWeekend) cls += ' weekend';
+    else if (disabled) cls += ' disabled';
+    if (hasData && !isWeekend) cls += ' has-data';
+
+    if (!disabled) {
+      if (calSelStart && calSelEnd) {
+        const [s,e] = [calSelStart,calSelEnd].sort();
+        if (dateStr === s) cls += ' range-start';
+        if (dateStr === e) cls += ' range-end';
+        if (dateStr > s && dateStr < e) cls += ' in-range';
+      } else if (calSelStart && dateStr === calSelStart) {
+        cls += ' selected';
+      }
+    }
+
+    html += `<div class="${cls}" onclick="calDayClick('${dateStr}',${disabled})" title="${isWeekend ? '🚫 Time não trabalha aos fins de semana' : ''}">${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function calDayClick(dateStr, disabled) {
+  if (disabled) return;
+  if (calMode === 'day') {
+    calSelStart = dateStr; calSelEnd = null;
+  } else {
+    if (!calSelStart || calPickingEnd === false && calSelStart === null) {
+      calSelStart = dateStr; calSelEnd = null; calPickingEnd = true;
+    } else if (calPickingEnd) {
+      if (dateStr < calSelStart) { calSelEnd = calSelStart; calSelStart = dateStr; }
+      else calSelEnd = dateStr;
+      calPickingEnd = false;
+    } else {
+      calSelStart = dateStr; calSelEnd = null; calPickingEnd = true;
+    }
+  }
+  updateCalFooter();
+  renderCalGrid();
+}
+
+function updateCalFooter() {
+  const lbl = document.getElementById('calRangeLabel');
+  if (!calSelStart) { lbl.innerHTML = 'Selecione uma data'; return; }
+  const fmtDate = s => { const [y,m,d] = s.split('-'); return `${d}/${m}`; };
+  if (calMode === 'day') {
+    lbl.innerHTML = `<strong>${fmtDate(calSelStart)}</strong>`;
+  } else if (calSelStart && !calSelEnd) {
+    lbl.innerHTML = `<strong>${fmtDate(calSelStart)}</strong> → selecione o fim`;
+  } else if (calSelStart && calSelEnd) {
+    const [s,e] = [calSelStart,calSelEnd].sort();
+    lbl.innerHTML = `<strong>${fmtDate(s)}</strong> até <strong>${fmtDate(e)}</strong>`;
+  }
+}
+
+function clearCal() {
+  calSelStart = null; calSelEnd = null; calPickingEnd = false;
+  updateCalFooter(); renderCalGrid();
+}
+
+function applyCal() {
+  if (!calSelStart) return;
+  document.getElementById('calOverlay').classList.remove('open');
+  const fmtDate = s => { const [y,m,d] = s.split('-'); return `${d}/${m}`; };
+
+  if (calMode === 'day') {
+    const key = calSelStart;
+    document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+    document.getElementById('calTrigger').classList.add('has-range');
+    document.getElementById('calBtnLabel').textContent = fmtDate(key);
+    if (currentView === 'freshdesk') { fdPeriod = DATA_FD[key] ? key : 'total'; renderFD(); }
+    else { currentPeriod = DATA[key] ? key : 'total'; renderAll(); }
+  } else if (calSelStart && calSelEnd) {
+    const [s, e] = [calSelStart, calSelEnd].sort();
+    document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+    document.getElementById('calTrigger').classList.add('has-range');
+    document.getElementById('calBtnLabel').textContent = `${fmtDate(s)} – ${fmtDate(e)}`;
+    if (currentView === 'freshdesk') {
+      const merged = mergeFDRange(s, e);
+      if (merged) { DATA_FD['_custom'] = merged; fdPeriod = '_custom'; renderFD(); }
+    } else {
+      const merged = mergeRange(s, e);
+      if (merged) { DATA['_custom'] = merged; currentPeriod = '_custom'; renderAll(); }
+    }
+  }
+}
+
+function mergeRange(startStr, endStr) {
+  // collect available weekday days within range (skip sat/sun)
+  const days = Array.from(AVAILABLE_DATES).filter(d => {
+    if (d < startStr || d > endStr) return false;
+    const dow = new Date(d + 'T12:00:00').getDay();
+    return dow !== 0 && dow !== 6;
+  }).sort();
+  if (!days.length) return null;
+
+  // sum up all agents and totals
+  const result = { _motivos: {}, _degraus: {}, _produtos: {}, _totals: {} };
+  const fields = ['tickets','ret_total','ret_parcial','gateway_hg','proposta','negado','gateway_tiger','cancelamentos'];
+
+  for (const ag of ['Heitor','Natália','Neythan','Yasmin']) {
+    result[ag] = Object.fromEntries(fields.map(f => [f, 0]));
+  }
+
+  for (const day of days) {
+    const d = DATA[day];
+    if (!d) continue;
+    for (const ag of ['Heitor','Natália','Neythan','Yasmin']) {
+      const a = d[ag] || {};
+      for (const f of fields) result[ag][f] = (result[ag][f]||0) + (a[f]||0);
+    }
+    for (const [k,v] of Object.entries(d._motivos||{})) result._motivos[k] = (result._motivos[k]||0)+v;
+    for (const [k,v] of Object.entries(d._degraus||{})) result._degraus[k] = (result._degraus[k]||0)+v;
+    for (const [k,v] of Object.entries(d._produtos||{})) result._produtos[k] = (result._produtos[k]||0)+v;
+    for (const f of ['tickets','cancelamentos','ret_total','ret_parcial','gateway_hg','proposta','negado','gateway_tiger']) {
+      result._totals[f] = (result._totals[f]||0) + ((d._totals||{})[f]||0);
+    }
+  }
+
+  // compute taxa
+  for (const ag of ['Heitor','Natália','Neythan','Yasmin']) {
+    const a = result[ag];
+    a.taxa = a.cancelamentos > 0 ? Math.round((a.ret_total+a.ret_parcial)/a.cancelamentos*1000)/10 : 0;
+  }
+  const t = result._totals;
+  t.taxa = t.cancelamentos > 0 ? Math.round((t.ret_total+t.ret_parcial)/t.cancelamentos*1000)/10 : 0;
+
+  return result;
+}
+
+function isWeekendDate(dateStr) {
+  if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return false;
+  const dow = new Date(dateStr + 'T12:00:00').getDay();
+  return dow === 0 || dow === 6;
+}
+
+function renderAll() {
+  // show weekend warning banner if needed
+  const banner = document.getElementById('weekendBanner');
+  if (isWeekendDate(currentPeriod)) {
+    banner.style.display = 'flex';
+    banner.querySelector('span').textContent = '🚫 O time não trabalha aos fins de semana — sem dados para este dia.';
+  } else if (currentPeriod !== '_custom' && !DATA[currentPeriod]) {
+    banner.style.display = 'flex';
+    banner.querySelector('span').textContent = '⚠️ Sem dados para este período ainda. Exporte o CSV do Freshdesk e atualize.';
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const d = DATA[currentPeriod] || DATA['total'];
+  renderKPIs(d);
+  renderAgentCards(d);
+  renderRetMotivo(d);
+  renderProdLadder(d);
+  renderTable(d);
+}
+
+function fmt(n) {
+  if (typeof n !== 'number') return '—';
+  return n.toLocaleString('pt-BR');
+}
+
+function renderKPIs(d) {
+  const t = d._totals || {};
+  const ret = (t.ret_total||0) + (t.ret_parcial||0);
+  const taxa = t.taxa || 0;
+  const kpis = [
+    { label:'Tickets no Período', value: fmt(t.tickets), sub: 'Total', color:'#007aff' },
+    { label:'Ret. Total — Aceitou', value: fmt(t.ret_total), sub: `${t.tickets ? ((t.ret_total/t.tickets)*100).toFixed(1) : 0}% dos tickets`, color:'#34c759' },
+    { label:'Ret. Parcial', value: fmt(t.ret_parcial), sub: `${t.tickets ? ((t.ret_parcial/t.tickets)*100).toFixed(1) : 0}%`, color:'#ff9500' },
+    { label:'Taxa de Retenção', value: taxa.toFixed(1)+'%', sub: 'Ret. Total + Parcial', color: taxa >= 20 ? '#34c759' : taxa >= 10 ? '#ff9500' : '#ff3b30' },
+    { label:'Gateway HG', value: fmt(t.gateway_hg), sub: `${t.tickets ? ((t.gateway_hg/t.tickets)*100).toFixed(1) : 0}%`, color:'#5ac8fa' },
+    { label:'Proposta Enviada', value: fmt(t.proposta), sub: 'Aguardando resposta', color:'#af52de' },
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
+    <div class="kpi-card" style="--kpi-color:${k.color}">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-sub">${k.sub}</div>
+    </div>
+  `).join('');
+}
+
+function renderAgentCards(d) {
+  document.getElementById('agentCards').innerHTML = AGENTS.map(ag => {
+    const a = d[ag] || {};
+    const color = AGENT_CFG[ag].color;
+    const taxa = a.taxa || 0;
+    const taxaColor = taxa >= 20 ? '#34c759' : taxa >= 10 ? '#ff9500' : '#ff3b30';
+    return `<div class="agent-card" style="--ac:${color}">
+      <div class="agent-name">${ag}</div>
+      <div class="agent-role">${AGENT_CFG[ag].role}</div>
+      <div class="ag-stats">
+        <div>
+          <div class="ag-stat-label">Tickets</div>
+          <div class="ag-stat-val">${fmt(a.tickets||0)}</div>
+        </div>
+        <div>
+          <div class="ag-stat-label">Taxa Ret.</div>
+          <div class="ag-stat-val" style="color:${taxaColor}">${taxa.toFixed(1)}%</div>
+        </div>
+        <div>
+          <div class="ag-stat-label">Ret. Total</div>
+          <div class="ag-stat-val" style="color:#34c759">${fmt(a.ret_total||0)}</div>
+        </div>
+      </div>
+      <div class="ag-bottom">
+        <div>
+          <div class="ag-b-label">Ret. Parc.</div>
+          <div class="ag-b-val" style="color:#ff9500">${fmt(a.ret_parcial||0)}</div>
+        </div>
+        <div>
+          <div class="ag-b-label">Gateway</div>
+          <div class="ag-b-val" style="color:#5ac8fa">${fmt(a.gateway_hg||0)}</div>
+        </div>
+        <div>
+          <div class="ag-b-label">Proposta</div>
+          <div class="ag-b-val" style="color:#af52de">${fmt(a.proposta||0)}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderRetMotivo(d) {
+  const t = d._totals || {};
+  const total = t.tickets || 1;
+  const retRows = [
+    { label:'Ret. Total — Aceitou usar', n: t.ret_total||0, color:'#34c759' },
+    { label:'Ret. Parcial', n: t.ret_parcial||0, color:'#30d158' },
+    { label:'Proposta Enviada — Aguardando', n: t.proposta||0, color:'#ff9500' },
+    { label:'Gateway HG', n: t.gateway_hg||0, color:'#5ac8fa' },
+    { label:'Fora Garantia / Negado', n: t.negado||0, color:'#ff3b30' },
+    { label:'Reembolso Total Tiger', n: t.gateway_tiger||0, color:'#ff6b6b' },
+  ];
+  const maxRet = Math.max(...retRows.map(r=>r.n), 1);
+
+  const motivos = d._motivos || {};
+  const motivoEntries = Object.entries(motivos).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxMot = motivoEntries.length ? motivoEntries[0][1] : 1;
+
+  document.getElementById('retMotivoGrid').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">📈 Resultado de Retenção
+        <span class="sec-title-badge" id="retPeriodLabel"></span>
+      </div>
+      ${retRows.map(r => `
+        <div class="ret-row">
+          <span class="ret-label">${r.label}</span>
+          <div class="ret-bar-wrap"><div class="ret-bar" style="width:${Math.round(r.n/maxRet*100)}%;background:${r.color}"></div></div>
+          <span class="ret-count">${fmt(r.n)} (${(r.n/total*100).toFixed(1)}%)</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">💔 Motivos de Descontentamento</div>
+      ${motivoEntries.length ? motivoEntries.map(([label,n]) => `
+        <div class="motivo-row">
+          <span class="motivo-label" title="${label}">${label}</span>
+          <div class="motivo-bar-wrap"><div class="motivo-bar" style="width:${Math.round(n/maxMot*100)}%"></div></div>
+          <span class="motivo-count">${fmt(n)} casos</span>
+        </div>
+      `).join('') : '<div style="color:var(--muted);font-size:12px;padding:12px 0">Sem dados para este período</div>'}
+    </div>
+  `;
+}
+
+function renderProdLadder(d) {
+  const produtos = d._produtos || {};
+  const prodEntries = Object.entries(produtos).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const maxProd = prodEntries.length ? prodEntries[0][1] : 1;
+
+  const rawDegraus = d._degraus || {};
+  // normalize degrau labels
+  const dNorm = {
+    'HelpGrid reembolsou': 0,
+    '1° Sondagem': 0, '1° Sondagem — Descoberta do motivo real': 0,
+    '2° Educação + Empatia': 0, '2° Educação + Empatia — Reframing da fase de adaptação': 0, '2° Educação + Empatia — Reframing': 0,
+    '3° Ebook': 0, '3° Ebook Personalizado — Protocolo clínico customizado': 0, '3° Ebook Personalizado — Protocolo clínico': 0,
+    '4° Acesso VIP': 0, '4° Acesso VIP (App) + Fricção de Retorno': 0,
+    '5° Combo App': 0, '5° Combo App + Reembolso Parcial (50%)': 0,
+    '6° Parcial 50–70%': 0, '6° Parcial 50–70% → Total (último recurso)': 0,
+  };
+  const dMap = {
+    'HelpGrid reembolsou':'HelpGrid reembolsou',
+    '1° Sondagem':'1° Sondagem','1° Sondagem — Descoberta do motivo real':'1° Sondagem',
+    '2° Educação + Empatia':'2° Educação + Empatia','2° Educação + Empatia — Reframing da fase de adaptação':'2° Educação + Empatia','2° Educação + Empatia — Reframing':'2° Educação + Empatia',
+    '3° Ebook':'3° Ebook Personalizado','3° Ebook Personalizado — Protocolo clínico customizado':'3° Ebook Personalizado','3° Ebook Personalizado — Protocolo clínico':'3° Ebook Personalizado',
+    '4° Acesso VIP':'4° Acesso VIP (App)','4° Acesso VIP (App) + Fricção de Retorno':'4° Acesso VIP (App)',
+    '5° Combo App':'5° Combo App + 50%','5° Combo App + Reembolso Parcial (50%)':'5° Combo App + 50%',
+    '6° Parcial 50–70%':'6° Parcial 50–70%','6° Parcial 50–70% → Total (último recurso)':'6° Parcial 50–70%',
+  };
+  const agg = {};
+  for (const [k,v] of Object.entries(rawDegraus)) {
+    const mapped = dMap[k] || null;
+    if (mapped) agg[mapped] = (agg[mapped]||0) + v;
+  }
+  const degrauOrder = ['HelpGrid reembolsou','1° Sondagem','2° Educação + Empatia','3° Ebook Personalizado','4° Acesso VIP (App)','5° Combo App + 50%','6° Parcial 50–70%'];
+  const dEntries = degrauOrder.map((k,i) => [k, agg[k]||0]).filter(e=>e[1]>0);
+  const maxDeg = dEntries.length ? Math.max(...dEntries.map(e=>e[1])) : 1;
+
+  document.getElementById('prodLadderGrid').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">📦 Tickets por Produto</div>
+      ${prodEntries.map(([name,n]) => `
+        <div class="prod-row">
+          <span class="prod-name">${name}</span>
+          <div class="prod-bar-wrap"><div class="prod-bar" style="width:${Math.round(n/maxProd*100)}%"></div></div>
+          <span class="prod-count">${fmt(n)} tickets</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">🧭 Degraus da Escada de Retenção</div>
+      ${dEntries.map(([label,n],i) => `
+        <div class="ladder-row">
+          <div class="ladder-num" style="background:${LADDER_COLORS[i]}22;color:${LADDER_COLORS[i]}">${i===0?'HG':(i)}</div>
+          <span class="ladder-label" title="${label}">${label}</span>
+          <div class="ladder-bar-wrap"><div class="ladder-bar" style="width:${Math.round(n/maxDeg*100)}%;background:${LADDER_COLORS[i]}"></div></div>
+          <span class="ladder-count">${fmt(n)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderTable(d) {
+  const totals = d._totals || {};
+  const rows = AGENTS.map(ag => {
+    const a = d[ag] || {};
+    const taxa = a.taxa||0;
+    const taxaColor = taxa >= 20 ? 'green-badge' : taxa >= 10 ? '' : 'red-badge';
+    return `<tr>
+      <td style="font-weight:600;color:${AGENT_CFG[ag].color}">${ag}</td>
+      <td>${fmt(a.tickets||0)}</td>
+      <td><span style="color:#34c759;font-weight:700">${fmt(a.ret_total||0)}</span></td>
+      <td><span style="color:#ff9500;font-weight:700">${fmt(a.ret_parcial||0)}</span></td>
+      <td>${fmt(a.gateway_hg||0)}</td>
+      <td>${fmt(a.proposta||0)}</td>
+      <td>${fmt(a.gateway_tiger||0)}</td>
+      <td><span class="badge ${taxaColor}" style="${!taxaColor?'color:var(--muted)':''}">${taxa.toFixed(1)}%</span></td>
+    </tr>`;
+  }).join('');
+
+  const t = totals;
+  const totalTaxa = t.taxa||0;
+  const ttColor = totalTaxa >= 20 ? 'green-badge' : totalTaxa >= 10 ? '' : 'red-badge';
+
+  document.getElementById('tableSection').innerHTML = `
+    <div class="sec-title">📋 Desempenho por Agente — Detalhado</div>
+    <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Agente</th>
+          <th>Tickets</th>
+          <th>Ret. Total</th>
+          <th>Ret. Parcial</th>
+          <th>Gateway HG</th>
+          <th>Proposta Env.</th>
+          <th>Reemb. Tiger</th>
+          <th>Taxa Ret.</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+        <tr>
+          <td>TOTAL</td>
+          <td>${fmt(t.tickets)}</td>
+          <td style="color:#34c759">${fmt(t.ret_total)}</td>
+          <td style="color:#ff9500">${fmt(t.ret_parcial)}</td>
+          <td>${fmt(t.gateway_hg)}</td>
+          <td>${fmt(t.proposta)}</td>
+          <td>${fmt(t.gateway_tiger)}</td>
+          <td><span class="badge ${ttColor}">${totalTaxa.toFixed(1)}%</span></td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  `;
+}
+
+function toggleDark() {
+  document.body.classList.toggle('dark');
+  const btn = document.querySelector('.dark-btn');
+  btn.textContent = document.body.classList.contains('dark') ? '☀️ Modo Claro' : '🌙 Modo Escuro';
+}
+
+// ====== MORNING BRIEF DATA ======
+const MORNING_DATA = {
+  date: '2026-05-14',
+  hora_exportacao: '11:05',
+  totals: {"total_abertos": 123, "criados_hoje": 3, "pos17h_ontem": 18, "retroativos": 102},
+  produtos: {"GlucoRecover": 20, "AudiLeaf": 16, "NervoLyn": 15, "ProstaFense": 13, "VisiumPro": 13, "MaroBrain": 7, "Lipovive": 5, "VigorLong": 4, "ReduBurn": 4, "BoosterXT": 2, "VisiumPro, GlucoRecover": 1},
+  agents: {"Heitor": {"total_abertos": 37, "criados_hoje": 0, "pos17h_ontem": 8, "retroativos": 29, "status": {"Open": 19, "Waiting on Customer": 17, "Pending": 1}, "prioridade": {"Medium": 31, "High": 6}}, "Natália": {"total_abertos": 26, "criados_hoje": 1, "pos17h_ontem": 0, "retroativos": 25, "status": {"Open": 17, "Waiting on Customer": 7, "Pending": 2}, "prioridade": {"Medium": 17, "High": 8, "Low": 1}}, "Neythan": {"total_abertos": 30, "criados_hoje": 1, "pos17h_ontem": 5, "retroativos": 24, "status": {"Open": 15, "Waiting on Customer": 15}, "prioridade": {"Medium": 23, "High": 7}}, "Yasmin": {"total_abertos": 30, "criados_hoje": 1, "pos17h_ontem": 5, "retroativos": 24, "status": {"Waiting on Customer": 19, "Open": 10, "Pending": 1}, "prioridade": {"Medium": 25, "High": 3, "Low": 2}}}
+};
+
+function renderMorning() {
+  const d = MORNING_DATA;
+  const t = d.totals;
+  const agents = ['Heitor', 'Natália', 'Neythan', 'Yasmin'];
+  const fmtDate = s => { const [y,m,day] = s.split('-'); return `${day}/${m}/${y}`; };
+
+  document.getElementById('morning-meta').textContent =
+    `CSV exportado às ${d.hora_exportacao} · ${fmtDate(d.date)}`;
+
+  // KPIs
+  document.getElementById('morning-kpis').innerHTML = [
+    { label: 'Total na Fila',      value: t.total_abertos,  sub: 'tickets abertos agora',          color: '#ff3b30' },
+    { label: 'Retroativos',        value: t.retroativos,    sub: 'criados antes de ontem 17h',      color: '#ff9500' },
+    { label: 'Pós-17h Ontem',      value: t.pos17h_ontem,   sub: 'chegaram após expediente',        color: '#af52de' },
+    { label: 'Criados Hoje',       value: t.criados_hoje,   sub: 'chegaram esta manhã',             color: '#007aff' },
+    { label: 'Agentes no Turno',   value: 4,                sub: 'Heitor · Natália · Neythan · Yasmin', color: '#34c759' },
+    { label: 'Média por Agente',   value: Math.round(t.total_abertos / 4), sub: 'tickets na fila', color: '#5ac8fa' },
+  ].map(k => `<div class="kpi-card" style="--kpi-color:${k.color}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value">${k.value}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+  // Agent queue cards
+  document.getElementById('morning-agents').innerHTML = agents.map(ag => {
+    const a = d.agents[ag];
+    const color = AGENT_CFG[ag].color;
+    const highPrio = a.prioridade['High'] || 0;
+    const urgente  = a.prioridade['Urgent'] || 0;
+    const críticos = highPrio + urgente;
+    const retroPct = Math.round(a.retroativos / (a.total_abertos || 1) * 100);
+
+    return `<div class="agent-card" style="--ac:${color}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div class="agent-name">${ag}</div>
+          <div class="agent-role">fila de entrada</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:32px;font-weight:800;color:${color};line-height:1">${a.total_abertos}</div>
+          <div style="font-size:10px;color:var(--muted)">abertos</div>
+        </div>
+      </div>
+
+      <div style="margin:12px 0 8px;height:4px;background:var(--border);border-radius:2px;overflow:hidden;display:flex;gap:1px">
+        <div style="width:${Math.round(a.retroativos/a.total_abertos*100)}%;background:#ff9500" title="Retroativos"></div>
+        <div style="width:${Math.round(a.pos17h_ontem/a.total_abertos*100)}%;background:#af52de" title="Pós-17h"></div>
+        <div style="width:${Math.round(a.criados_hoje/a.total_abertos*100)}%;background:#007aff" title="Hoje"></div>
+      </div>
+      <div style="display:flex;gap:10px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:12px">
+        <span style="color:#ff9500">● ${a.retroativos} retro</span>
+        <span style="color:#af52de">● ${a.pos17h_ontem} pós-17h</span>
+        <span style="color:#007aff">● ${a.criados_hoje} hoje</span>
+      </div>
+
+      <div class="ag-bottom">
+        <div>
+          <div class="ag-b-label">🔴 High/Urgent</div>
+          <div class="ag-b-val" style="color:${críticos > 3 ? '#ff3b30' : '#ff9500'}">${críticos}</div>
+        </div>
+        <div>
+          <div class="ag-b-label">Waiting</div>
+          <div class="ag-b-val" style="color:#5ac8fa">${a.status['Waiting on Customer'] || 0}</div>
+        </div>
+        <div>
+          <div class="ag-b-label">Pending</div>
+          <div class="ag-b-val" style="color:#af52de">${a.status['Pending'] || 0}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Breakdown: status + prioridade
+  const statusColors = {Open:'#ff3b30','Waiting on Customer':'#ff9500',Pending:'#af52de','Waiting on Third Party':'#5ac8fa'};
+  const prioColors   = {Urgent:'#ff2d55',High:'#ff3b30',Medium:'#ff9500',Low:'#34c759'};
+  document.getElementById('morning-breakdown').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">📋 Status por Agente</div>
+      ${agents.map(ag => {
+        const a = d.agents[ag]; const color = AGENT_CFG[ag].color;
+        return `<div class="ret-row">
+          <span class="ret-label" style="flex:0 0 80px;color:${color};font-weight:600">${ag}</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            ${Object.entries(a.status).map(([s,n]) => `
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:9px;color:var(--muted);width:120px;text-align:right">${s}</span>
+                <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${Math.round(n/a.total_abertos*100)}%;background:${statusColors[s]||color}"></div></div>
+                <span style="font-size:11px;font-weight:600;min-width:20px;text-align:right;color:var(--muted2)">${n}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">⚡ Prioridade por Agente</div>
+      ${agents.map(ag => {
+        const a = d.agents[ag]; const color = AGENT_CFG[ag].color;
+        return `<div class="ret-row">
+          <span class="ret-label" style="flex:0 0 80px;color:${color};font-weight:600">${ag}</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            ${Object.entries(a.prioridade).map(([p,n]) => `
+              <div style="display:flex;align-items:center;gap:6px">
+                <span style="font-size:9px;color:var(--muted);width:60px;text-align:right">${p}</span>
+                <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${Math.round(n/a.total_abertos*100)}%;background:${prioColors[p]||color}"></div></div>
+                <span style="font-size:11px;font-weight:600;min-width:20px;text-align:right;color:var(--muted2)">${n}</span>
+              </div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Products
+  const PROD_COLORS = ['#007aff','#34c759','#ff9500','#af52de','#ff3b30','#5ac8fa','#ff2d55','#30d158','#ffd60a','#bf5af2'];
+  const prods = Object.entries(d.produtos||{}).filter(([,v])=>typeof v==='number').sort((a,b)=>b[1]-a[1]);
+  const maxP = prods.length ? prods[0][1] : 1;
+  document.getElementById('morning-produtos').innerHTML = `
+    <div class="sec-title">📦 Produtos na Fila Atual</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px">
+      ${prods.map(([name,n],i) => `
+        <div class="prod-row">
+          <span class="prod-name" style="color:${PROD_COLORS[i%PROD_COLORS.length]};font-weight:600">${name}</span>
+          <div class="prod-bar-wrap"><div class="prod-bar" style="width:${Math.round(n/maxP*100)}%;background:${PROD_COLORS[i%PROD_COLORS.length]}"></div></div>
+          <span class="prod-count">${n} tickets</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ====== PERFORMANCE DATA (Agent Performance Report — 6 meses) ======
+const PERF_DATA = {
+  Heitor:  { tickets_atribuidos:1291, tickets_resolvidos:830,  tickets_reabertos:43,  tickets_reatribuidos:477, notas_privadas:315, respostas:635,  tempo_primeira_resposta:'1s 2d 16h', tempo_resolucao:'3s 3d 15h', resolution_sla_pct:15.65, primeira_resposta_sla_pct:16.22, fcr_pct:80.44, violacoes_primeira_resposta:284, violacoes_resolucao:690, violacoes_fcr:160, handling_time:'1d 6h 38m', handling_pct:28.72, color:'#007aff' },
+  Natália: { tickets_atribuidos:1610, tickets_resolvidos:992,  tickets_reabertos:77,  tickets_reatribuidos:624, notas_privadas:515, respostas:652,  tempo_primeira_resposta:'1s 2d 5h',  tempo_resolucao:'2s 5d 13h', resolution_sla_pct:19.77, primeira_resposta_sla_pct:16.77, fcr_pct:80.97, violacoes_primeira_resposta:273, violacoes_resolucao:763, violacoes_fcr:181, handling_time:'12h 26m',   handling_pct:11.65, color:'#ff9500' },
+  Neythan: { tickets_atribuidos:1411, tickets_resolvidos:883,  tickets_reabertos:64,  tickets_reatribuidos:482, notas_privadas:18,  respostas:796,  tempo_primeira_resposta:'1s 6d 6h',  tempo_resolucao:'2s 4d 14h', resolution_sla_pct:32.08, primeira_resposta_sla_pct:21.09, fcr_pct:75.43, violacoes_primeira_resposta:333, violacoes_resolucao:597, violacoes_fcr:216, handling_time:'1d 15h 34m', handling_pct:37.09, color:'#34c759' },
+  Yasmin:  { tickets_atribuidos:1508, tickets_resolvidos:1065, tickets_reabertos:113, tickets_reatribuidos:396, notas_privadas:779, respostas:982,  tempo_primeira_resposta:'1s 2d 12h', tempo_resolucao:'2s 13h',   resolution_sla_pct:28.36, primeira_resposta_sla_pct:18.83, fcr_pct:76.87, violacoes_primeira_resposta:401, violacoes_resolucao:768, violacoes_fcr:248, handling_time:'23h 19m',   handling_pct:21.86, color:'#af52de' }
+};
+
+function slaColor(pct) {
+  if (pct >= 80) return '#34c759';
+  if (pct >= 50) return '#ff9500';
+  return '#ff3b30';
+}
+
+function renderPerf() {
+  const agents = ['Heitor','Natália','Neythan','Yasmin'];
+  const maxRes = Math.max(...agents.map(a => PERF_DATA[a].tickets_atribuidos));
+
+  // Agent cards
+  document.getElementById('perf-agentCards').innerHTML = agents.map(ag => {
+    const p = PERF_DATA[ag];
+    const resolvPct = Math.round(p.tickets_resolvidos / p.tickets_atribuidos * 100);
+    const fcrColor = slaColor(p.fcr_pct);
+    const slaColor2 = slaColor(p.resolution_sla_pct);
+    return `<div class="agent-card" style="--ac:${p.color}">
+      <div class="agent-name">${ag}</div>
+      <div class="agent-role">últimos 6 meses</div>
+      <div class="ag-stats">
+        <div><div class="ag-stat-label">Atribuídos</div><div class="ag-stat-val">${p.tickets_atribuidos.toLocaleString('pt-BR')}</div></div>
+        <div><div class="ag-stat-label">Resolvidos</div><div class="ag-stat-val" style="color:#34c759">${p.tickets_resolvidos.toLocaleString('pt-BR')}</div></div>
+        <div><div class="ag-stat-label">Respostas</div><div class="ag-stat-val" style="color:${p.color}">${p.respostas.toLocaleString('pt-BR')}</div></div>
+      </div>
+      <div class="ag-bottom">
+        <div><div class="ag-b-label">SLA Res.</div><div class="ag-b-val" style="color:${slaColor2}">${p.resolution_sla_pct}%</div></div>
+        <div><div class="ag-b-label">FCR</div><div class="ag-b-val" style="color:${fcrColor}">${p.fcr_pct}%</div></div>
+        <div><div class="ag-b-label">Reabertos</div><div class="ag-b-val" style="color:#ff9500">${p.tickets_reabertos}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // SLA bars
+  const maxSla = 100;
+  const slaRows = agents.map(ag => {
+    const p = PERF_DATA[ag];
+    const c = p.color;
+    return `<div class="ret-row">
+      <span class="ret-label" style="flex:0 0 80px;color:${c};font-weight:600">${ag}</span>
+      <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--muted);width:80px">SLA Resolução</span>
+          <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${p.resolution_sla_pct}%;background:${slaColor(p.resolution_sla_pct)}"></div></div>
+          <span style="font-size:11px;font-weight:600;color:${slaColor(p.resolution_sla_pct)};min-width:40px;text-align:right">${p.resolution_sla_pct}%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--muted);width:80px">SLA 1ª Resp.</span>
+          <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${p.primeira_resposta_sla_pct}%;background:${slaColor(p.primeira_resposta_sla_pct)}"></div></div>
+          <span style="font-size:11px;font-weight:600;color:${slaColor(p.primeira_resposta_sla_pct)};min-width:40px;text-align:right">${p.primeira_resposta_sla_pct}%</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;color:var(--muted);width:80px">FCR</span>
+          <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${p.fcr_pct}%;background:${slaColor(p.fcr_pct)}"></div></div>
+          <span style="font-size:11px;font-weight:600;color:${slaColor(p.fcr_pct)};min-width:40px;text-align:right">${p.fcr_pct}%</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('perf-slaGrid').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">🎯 SLA e FCR por Agente
+        <span class="sec-title-badge" style="font-size:10px;color:var(--muted)">🟢 ≥80% &nbsp; 🟡 50–79% &nbsp; 🔴 &lt;50%</span>
+      </div>
+      ${slaRows}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">⏱️ Tempo Médio de Resolução</div>
+      ${agents.map(ag => {
+        const p = PERF_DATA[ag];
+        return `<div class="ret-row">
+          <span class="ret-label" style="flex:0 0 80px;color:${p.color};font-weight:600">${ag}</span>
+          <div style="flex:1">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:2px">1ª resposta</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${p.tempo_primeira_resposta}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;margin-bottom:2px">Resolução</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text)">${p.tempo_resolucao}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:10px;color:var(--muted)">Handling</div>
+            <div style="font-size:13px;font-weight:600;color:${p.color}">${p.handling_pct}%</div>
+            <div style="font-size:11px;color:var(--muted)">${p.handling_time}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Violations
+  const maxViol = Math.max(...agents.map(a => PERF_DATA[a].violacoes_resolucao));
+  document.getElementById('perf-violGrid').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">🚨 Violações de SLA — Resolução</div>
+      ${agents.map(ag => {
+        const p = PERF_DATA[ag];
+        const pct = Math.round(p.violacoes_resolucao / maxViol * 100);
+        return `<div class="prod-row">
+          <span class="prod-name" style="color:${p.color};font-weight:600">${ag}</span>
+          <div class="prod-bar-wrap"><div class="prod-bar" style="width:${pct}%;background:#ff3b30"></div></div>
+          <span class="prod-count" style="color:#ff3b30;font-weight:600">${p.violacoes_resolucao}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">🔄 Tickets Reatribuídos / Reabertos</div>
+      ${agents.map(ag => {
+        const p = PERF_DATA[ag];
+        const maxR = Math.max(...agents.map(a => PERF_DATA[a].tickets_reatribuidos));
+        const pctR = Math.round(p.tickets_reatribuidos / maxR * 100);
+        const pctRe = Math.round(p.tickets_reabertos / Math.max(...agents.map(a => PERF_DATA[a].tickets_reabertos)) * 100);
+        return `<div class="ret-row">
+          <span class="ret-label" style="flex:0 0 80px;color:${p.color};font-weight:600">${ag}</span>
+          <div style="flex:1;display:flex;flex-direction:column;gap:4px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:10px;color:var(--muted);width:80px">Reatribuídos</span>
+              <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${pctR}%;background:#ff9500"></div></div>
+              <span style="font-size:11px;font-weight:600;min-width:36px;text-align:right;color:var(--muted2)">${p.tickets_reatribuidos}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:10px;color:var(--muted);width:80px">Reabertos</span>
+              <div class="ret-bar-wrap" style="flex:1"><div class="ret-bar" style="width:${pctRe}%;background:#af52de"></div></div>
+              <span style="font-size:11px;font-weight:600;min-width:36px;text-align:right;color:var(--muted2)">${p.tickets_reabertos}</span>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+
+  // Full table
+  const tRows = agents.map(ag => {
+    const p = PERF_DATA[ag];
+    const taxaRes = Math.round(p.tickets_resolvidos / p.tickets_atribuidos * 100);
+    return `<tr>
+      <td style="font-weight:700;color:${p.color}">${ag}</td>
+      <td>${p.tickets_atribuidos.toLocaleString('pt-BR')}</td>
+      <td style="color:#34c759;font-weight:600">${p.tickets_resolvidos.toLocaleString('pt-BR')} <span style="font-size:10px;color:var(--muted)">(${taxaRes}%)</span></td>
+      <td>${p.respostas}</td>
+      <td style="color:#ff9500">${p.tickets_reabertos}</td>
+      <td style="color:${slaColor(p.resolution_sla_pct)};font-weight:600">${p.resolution_sla_pct}%</td>
+      <td style="color:${slaColor(p.primeira_resposta_sla_pct)};font-weight:600">${p.primeira_resposta_sla_pct}%</td>
+      <td style="color:${slaColor(p.fcr_pct)};font-weight:600">${p.fcr_pct}%</td>
+      <td style="color:#ff3b30">${p.violacoes_resolucao}</td>
+      <td style="color:${p.color}">${p.handling_pct}%</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('perf-table').innerHTML = `
+    <div class="sec-title">📋 Tabela Completa de Performance — 6 meses</div>
+    <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr>
+        <th>Agente</th><th>Atribuídos</th><th>Resolvidos</th><th>Respostas</th>
+        <th>Reabertos</th><th>SLA Res.</th><th>SLA 1ª Resp.</th><th>FCR</th>
+        <th>Violações Res.</th><th>Handling %</th>
+      </tr></thead>
+      <tbody>${tRows}</tbody>
+    </table></div>`;
+}
+
+// ====== VIEW SWITCHING ======
+
+
+function switchView(view) {
+  currentView = view;
+  document.getElementById('view-morning').style.display     = view === 'morning'     ? 'block' : 'none';
+  document.getElementById('view-forms').style.display       = view === 'forms'       ? 'block' : 'none';
+  document.getElementById('view-freshdesk').style.display   = view === 'freshdesk'   ? 'block' : 'none';
+  document.getElementById('view-performance').style.display = view === 'performance' ? 'block' : 'none';
+  document.getElementById('tabMorning').classList.toggle('active', view === 'morning');
+  document.getElementById('tabForms').classList.toggle('active',   view === 'forms');
+  document.getElementById('tabFD').classList.toggle('active',      view === 'freshdesk');
+  document.getElementById('tabPerf').classList.toggle('active',    view === 'performance');
+  // Hide period bar on Morning Brief (it has its own context), show on all others
+  document.getElementById('periodBar').style.display = view === 'morning' ? 'none' : '';
+  if      (view === 'morning')     renderMorning();
+  else if (view === 'freshdesk')   renderFD();
+  else if (view === 'forms')       renderAll();
+  else if (view === 'performance') renderPerf();
+}
+
+// ====== FRESHDESK DATA ======
+
+
+
+
+
+function setFDPeriod(key, btn) {
+  fdPeriod = key;
+  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.getElementById('calTrigger').classList.remove('has-range');
+  document.getElementById('calBtnLabel').textContent = 'Personalizado';
+  renderFD();
+}
+
+// Override setPeriod to route to correct view
+function setPeriod(key, btn) {
+  if (currentView === 'freshdesk') { setFDPeriod(key, btn); }
+  else {
+    currentPeriod = key;
+    document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    document.getElementById('calTrigger').classList.remove('has-range');
+    document.getElementById('calBtnLabel').textContent = 'Personalizado';
+    renderAll();
+  }
+}
+
+// ====== FD RENDER ======
+
+const TIPO_COLORS   = {'Refund':'#ff3b30','Question':'#007aff','Sales':'#34c759'};
+const PRIO_COLORS   = {'High':'#ff3b30','Medium':'#ff9500','Low':'#34c759'};
+
+function barList(obj, colorMap, maxOverride) {
+  // Only include entries where value is a plain number (guard against object values)
+  const entries = Object.entries(obj)
+    .filter(([k, v]) => typeof v === 'number')
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 8);
+  if (!entries.length) return '<div style="color:var(--muted);font-size:12px;padding:8px 0">Sem dados</div>';
+  const max = maxOverride || entries[0][1] || 1;
+  return entries.map(([k,v]) => {
+    const color = colorMap?.[k] || '#007aff';
+    const pct = Math.round(v/max*100);
+    return `<div class="prod-row">
+      <span class="prod-name" style="flex:0 0 140px;color:${color};font-weight:600">${k}</span>
+      <div class="prod-bar-wrap" style="flex:1"><div class="prod-bar" style="width:${pct}%;background:${color}"></div></div>
+      <span class="prod-count">${v}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderFD() {
+  const isWeekend = isWeekendDate(fdPeriod);
+  const banner = document.getElementById('weekendBanner');
+
+  if (isWeekend) {
+    banner.style.display = 'flex';
+    banner.querySelector('span').textContent = '🚫 O time não trabalha aos fins de semana — sem dados para este dia.';
+  } else if (fdPeriod !== '_custom' && !DATA_FD[fdPeriod]) {
+    // Fallback to last available day
+    const lastDay = Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().at(-1);
+    if (lastDay) fdPeriod = lastDay;
+    const [y,mo,d] = (lastDay||'').split('-');
+    const lastLabel = lastDay ? `${d}/${mo}` : '—';
+    banner.style.display = 'flex';
+    banner.querySelector('span').innerHTML =
+      `📋 <strong>Hoje (${fmtShort(getHoje())}) ainda sem dados</strong> — aguardando exportação do Freshdesk no final do dia. Exibindo o último dia disponível: <strong>${lastLabel}</strong>.`;
+  } else {
+    banner.style.display = 'none';
+  }
+
+  const d = DATA_FD[fdPeriod] || DATA_FD['total'];
+  const t = d._totals || {};
+  const agents = ['Heitor','Natália','Neythan','Yasmin'];
+
+  // KPIs — show both criados and trabalhados
+  const criados    = t.tickets_criados    || t.tickets || 0;
+  const trabalhados= t.tickets_trabalhados|| t.tickets || 0;
+  const resolvidos = t.resolvidos_atividade || t.fechados || 0;
+  const notas      = t.notas_privadas || 0;
+  document.getElementById('fd-kpiGrid').innerHTML = [
+    {label:'Criados no Período',   value: criados,      sub:'tickets novos no dia/período',                  color:'#007aff'},
+    {label:'Trabalhados',          value: trabalhados,  sub:'respostas enviadas (interações reais)',          color:'#34c759'},
+    {label:'Resolvidos',           value: resolvidos,   sub:'fechados + resolvidos no dia',                  color:'#30d158'},
+    {label:'Valor em Pedidos',     value:`$${((t.valor_total||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}`, sub:'BuyGoods', color:'#ff9500'},
+    {label:'Notas Privadas',       value: notas,        sub:'comunicação interna',                           color:'#af52de'},
+    {label:'Em Aberto',            value: t.abertos||0, sub:'aguardando resolução',                          color:'#ff3b30'},
+  ].map(k=>`<div class="kpi-card" style="--kpi-color:${k.color}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value" style="font-size:${typeof k.value==='string'&&k.value.length>8?'20px':'28px'}">${k.value}</div>
+    <div class="kpi-sub">${k.sub}</div>
+  </div>`).join('');
+
+  // Agent cards — show criados + trabalhados
+  document.getElementById('fd-agentCards').innerHTML = agents.map(ag => {
+    const a = d[ag] || {};
+    const color = AGENT_CFG[ag].color;
+    const cri   = a.tickets_criados    || a.tickets || 0;
+    const trab  = a.tickets_trabalhados|| a.tickets || 0;
+    const resol = a.resolvidos_atividade || a.fechados || 0;
+    const notas = a.notas_privadas || 0;
+    const reab  = a.reabertos_atividade || 0;
+    return `<div class="agent-card" style="--ac:${color}">
+      <div class="agent-name">${ag}</div>
+      <div class="agent-role">${AGENT_CFG[ag].role}</div>
+      <div class="ag-stats">
+        <div><div class="ag-stat-label">Criados</div><div class="ag-stat-val" style="color:${color}">${cri}</div></div>
+        <div><div class="ag-stat-label">Respostas</div><div class="ag-stat-val" style="color:#34c759">${trab}</div></div>
+        <div><div class="ag-stat-label">Resolvidos</div><div class="ag-stat-val" style="color:#30d158">${resol}</div></div>
+      </div>
+      <div class="ag-bottom">
+        <div><div class="ag-b-label">Notas Priv.</div><div class="ag-b-val" style="color:#af52de">${notas}</div></div>
+        <div><div class="ag-b-label">Reabertos</div><div class="ag-b-val" style="color:#ff9500">${reab}</div></div>
+        <div><div class="ag-b-label">Valor</div><div class="ag-b-val" style="font-size:11px">$${((a.valor_total||0)).toLocaleString('pt-BR',{minimumFractionDigits:0})}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Row 1: Status | Tipo + Prioridade
+  document.getElementById('fd-row1').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">📊 Status dos Tickets</div>
+      ${barList(d._status||{}, STATUS_COLORS)}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title" style="margin-bottom:10px">🏷️ Tipo de Ticket</div>
+      ${barList(d._tipo||{}, TIPO_COLORS)}
+      <div class="sec-title" style="margin-top:16px;margin-bottom:10px">⚡ Prioridade</div>
+      ${barList(d._prioridade||{}, PRIO_COLORS)}
+    </div>`;
+
+  // Row 2: Produtos | Motivos
+  const prodVals = Object.values(d._produtos||{}).filter(v => typeof v === 'number');
+  const motVals  = Object.values(d._motivos||{}).filter(v => typeof v === 'number');
+  const maxProd = prodVals.length ? Math.max(...prodVals) : 1;
+  const maxMot  = motVals.length  ? Math.max(...motVals)  : 1;
+  document.getElementById('fd-row2').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">📦 Produto (Tags)</div>
+      ${barList(d._produtos||{}, null, maxProd)}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">💔 Motivo da Solicitação</div>
+      ${barList(d._motivos||{}, null, maxMot)}
+    </div>`;
+
+  // Row 3: Resultado/Retenção | Tier do cliente
+  document.getElementById('fd-row3').innerHTML = `
+    <div class="sec-card">
+      <div class="sec-title">🎯 Resultado de Retenção</div>
+      ${Object.keys(d._resultado||{}).length
+        ? barList(d._resultado||{}, {'Retido':'#34c759','Parcial':'#ff9500','Reembolsado':'#ff3b30'})
+        : '<div style="color:var(--muted);font-size:12px;padding:8px 0">⚠️ Campo ainda sendo preenchido pelo time no Freshdesk</div>'}
+    </div>
+    <div class="sec-card">
+      <div class="sec-title">💰 Tier do Cliente</div>
+      ${barList(d._tier||{}, {'HIGH - acima de $250':'#34c759','MEDIUM - $151 a $250':'#ff9500','LOW - até $150':'#5ac8fa'})}
+    </div>`;
+
+  // Table
+  const rows = agents.map(ag => {
+    const a = d[ag] || {};
+    const color = AGENT_CFG[ag].color;
+    const cri  = a.tickets_criados    || a.tickets || 0;
+    const trab = a.tickets_trabalhados|| a.tickets || 0;
+    return `<tr>
+      <td style="font-weight:700;color:${color}">${ag}</td>
+      <td style="color:${color};font-weight:600">${cri}</td>
+      <td style="color:#34c759;font-weight:700">${trab}</td>
+      <td style="color:#ff3b30;font-weight:700">${a.abertos||0}</td>
+      <td>${Object.entries(a.tipo||{}).map(([k,v])=>`${k}: ${v}`).join(', ')||'—'}</td>
+      <td>${Object.entries(a.prioridade||{}).map(([k,v])=>`${k}: ${v}`).join(', ')||'—'}</td>
+      <td>${a.interacoes_agente||0}</td>
+      <td>$${((a.valor_total||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+    </tr>`;
+  }).join('');
+  const tCri  = t.tickets_criados    || t.tickets || 0;
+  const tTrab = t.tickets_trabalhados|| t.tickets || 0;
+  document.getElementById('fd-tableSection').innerHTML = `
+    <div class="sec-title">📋 Desempenho Detalhado por Agente — Freshdesk</div>
+    <div style="overflow-x:auto">
+    <table class="data-table">
+      <thead><tr>
+        <th>Agente</th><th>Criados</th><th>Trabalhados</th><th>Em Aberto</th>
+        <th>Tipo</th><th>Prioridade</th><th>Interações</th><th>Valor em Pedidos</th>
+      </tr></thead>
+      <tbody>
+        ${rows}
+        <tr>
+          <td>TOTAL</td>
+          <td style="color:#007aff">${tCri}</td>
+          <td style="color:#34c759">${tTrab}</td>
+          <td style="color:#ff3b30">${t.abertos||0}</td>
+          <td>${Object.entries(d._tipo||{}).map(([k,v])=>`${k}: ${v}`).join(', ')||'—'}</td>
+          <td>${Object.entries(d._prioridade||{}).map(([k,v])=>`${k}: ${v}`).join(', ')||'—'}</td>
+          <td>${t.interacoes_agente||0}</td>
+          <td>$${((t.valor_total||0)).toLocaleString('pt-BR',{minimumFractionDigits:2})}</td>
+        </tr>
+      </tbody>
+    </table></div>`;
+}
+
+// ---- date helpers ----
+// ---- date helpers ----
+function toDateKey(d) {
+  // local date as YYYY-MM-DD (avoids UTC shift)
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+function getHoje()  { return toDateKey(new Date()); }
+function getOntem() { const d = new Date(); d.setDate(d.getDate() - 1); return toDateKey(d); }
+function fmtShort(s) {
+  if (!s) return '?';
+  const [, m, d] = s.split('-');
+  return `${d}/${m}`;
+}
+
+function mergeFDRange(startStr, endStr) {
+  const days = Array.from(FD_AVAILABLE).filter(d => {
+    if (d < startStr || d > endStr) return false;
+    const dow = new Date(d + 'T12:00:00').getDay();
+    return dow !== 0 && dow !== 6;
+  }).sort();
+  if (!days.length) return null;
+  const agents = ['Heitor','Natália','Neythan','Yasmin'];
+  const fields = ['tickets','fechados','abertos','interacoes_agente','interacoes_cliente','upsell'];
+  const result = { _totals:{tickets:0,fechados:0,abertos:0,valor_total:0,interacoes_agente:0},
+    _status:{}, _tipo:{}, _prioridade:{}, _produtos:{}, _motivos:{}, _resultado:{}, _tier:{} };
+  for (const ag of agents) result[ag] = {tickets:0,fechados:0,abertos:0,interacoes_agente:0,interacoes_cliente:0,valor_total:0,upsell:0,status:{},tipo:{},prioridade:{},produtos:{},motivos:{},resultado:{},tier:{}};
+  for (const day of days) {
+    const d = DATA_FD[day]; if (!d) continue;
+    for (const ag of agents) {
+      const a = d[ag]||{}; if (!a.tickets) continue;
+      for (const f of fields) result[ag][f] = (result[ag][f]||0)+(a[f]||0);
+      result[ag].valor_total = (result[ag].valor_total||0)+(a.valor_total||0);
+      for (const sub of ['status','tipo','prioridade','produtos','motivos','resultado','tier'])
+        for (const [k,v] of Object.entries(a[sub]||{})) result[ag][sub][k]=(result[ag][sub][k]||0)+v;
+    }
+    for (const f of ['tickets','fechados','abertos','interacoes_agente']) result._totals[f]+=(d._totals||{})[f]||0;
+    result._totals.valor_total+=((d._totals||{}).valor_total||0);
+    for (const sub of ['_status','_tipo','_prioridade','_produtos','_motivos','_resultado','_tier'])
+      for (const [k,v] of Object.entries(d[sub]||{})) result[sub][k]=(result[sub][k]||0)+v;
+  }
+  return result;
+}
+
+// INIT
+(function init() {
+  const hoje  = getHoje();
+  const ontem = getOntem();
+  const now   = new Date();
+
+  calViewYear  = now.getFullYear();
+  calViewMonth = now.getMonth();
+
+  const btnHoje  = document.getElementById('btnHoje');
+  const btnOntem = document.getElementById('btnOntem');
+  btnHoje.textContent  = `Hoje (${fmtShort(hoje)})`;
+  btnOntem.textContent = `Ontem (${fmtShort(ontem)})`;
+
+  // set FD period — hoje se disponível, senão último dia disponível
+  if (DATA_FD[hoje]) {
+    fdPeriod = hoje; btnHoje.classList.add('active');
+  } else if (DATA_FD[ontem]) {
+    fdPeriod = ontem; btnOntem.classList.add('active');
+  } else {
+    const last = Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().at(-1);
+    fdPeriod = last || 'total';
+  }
+
+  // set Forms period
+  if (DATA[hoje]) currentPeriod = hoje;
+  else if (DATA[ontem]) currentPeriod = ontem;
+  else currentPeriod = 'total';
+
+  // start on morning brief by default
+  switchView('morning');
+})();
+</script>
+</body>
+</html>
