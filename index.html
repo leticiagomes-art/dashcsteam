@@ -422,13 +422,9 @@ body {
     <div class="tab-dot" style="background:#ff9500"></div>
     🛒 Helpdesk BuyGoods
   </button>
-  <button class="tab" id="tabForms" onclick="switchView('forms')">
-    <div class="tab-dot" style="background:#34c759"></div>
-    📋 Formulário (até 08/05)
-  </button>
   <button class="tab" id="tabPerf" onclick="switchView('performance')">
     <div class="tab-dot" style="background:#ff3b30"></div>
-    📊 Performance (6 meses)
+    📊 Performance
   </button>
 </div>
 
@@ -532,17 +528,19 @@ body {
 
   </div>
 
-  <!-- ===== FORMS VIEW ===== -->
-  <div id="view-forms" style="display:none">
-    <div class="kpi-grid" id="kpiGrid"></div>
-    <div class="agent-row" id="agentCards"></div>
-    <div class="grid-2" id="retMotivoGrid"></div>
-    <div class="grid-2" id="prodLadderGrid"></div>
-    <div class="sec-card" style="margin-bottom:16px" id="tableSection"></div>
-  </div>
 
   <!-- ===== PERFORMANCE VIEW ===== -->
   <div id="view-performance" style="display:none">
+    <div id="perf-controls" style="margin-bottom:16px;padding:10px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px"></div>
+    <div class="kpi-grid" id="perf-kpis" style="margin-bottom:16px"></div>
+    <div class="agent-row" id="perf-agentCards" style="margin-bottom:16px"></div>
+    <div class="sec-card" id="perf-chart" style="margin-bottom:16px"></div>
+    <div class="sec-card" id="perf-rank" style="margin-bottom:16px"></div>
+    <div class="sec-card" id="perf-table" style="margin-bottom:16px"></div>
+
+    <details class="sec-card" style="margin-bottom:16px">
+      <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--text)">📁 Relatório antigo do Freshdesk (fixo, gerado em 12/05/2026) — SLA, FCR, tempos</summary>
+      <div style="margin-top:16px">
     <div style="margin-bottom:16px;padding:10px 14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;color:var(--muted);">
       📅 Dados do <strong style="color:var(--text)">Agent Performance Report — últimos 6 meses</strong> · Gerado em 12/05/2026 · Inclui todos os tickets respondidos por agente (independente de atribuição)
     </div>
@@ -558,16 +556,18 @@ body {
     </div>
 
     <!-- Agent cards performance -->
-    <div class="agent-row" id="perf-agentCards" style="margin-bottom:16px"></div>
+    <div class="agent-row" id="perfL-agentCards" style="margin-bottom:16px"></div>
 
     <!-- SLA + FCR -->
-    <div class="grid-2" id="perf-slaGrid" style="margin-bottom:16px"></div>
+    <div class="grid-2" id="perfL-slaGrid" style="margin-bottom:16px"></div>
 
     <!-- Handling time + Violações -->
-    <div class="grid-2" id="perf-violGrid" style="margin-bottom:16px"></div>
+    <div class="grid-2" id="perfL-violGrid" style="margin-bottom:16px"></div>
 
     <!-- Tabela completa -->
-    <div class="sec-card" id="perf-table" style="margin-bottom:16px"></div>
+    <div class="sec-card" id="perfL-table" style="margin-bottom:16px"></div>
+      </div>
+    </details>
   </div>
   <div id="view-freshdesk" style="display:block">
 
@@ -847,6 +847,7 @@ function isWeekendDate(dateStr) {
 }
 
 function renderAll() {
+  if (!document.getElementById('kpiGrid')) return;   // aba Formulário removida
   // show weekend warning banner if needed
   const banner = document.getElementById('weekendBanner');
   if (isWeekendDate(currentPeriod)) {
@@ -1249,12 +1250,12 @@ function slaColor(pct) {
   return '#ff3b30';
 }
 
-function renderPerf() {
+function renderPerfLegado() {
   const agents = ['Heitor','Natália','Neythan','Yasmin'];
   const maxRes = Math.max(...agents.map(a => PERF_DATA[a].tickets_atribuidos));
 
   // Agent cards
-  document.getElementById('perf-agentCards').innerHTML = agents.map(ag => {
+  document.getElementById('perfL-agentCards').innerHTML = agents.map(ag => {
     const p = PERF_DATA[ag];
     const resolvPct = Math.round(p.tickets_resolvidos / p.tickets_atribuidos * 100);
     const fcrColor = slaColor(p.fcr_pct);
@@ -1302,7 +1303,7 @@ function renderPerf() {
     </div>`;
   }).join('');
 
-  document.getElementById('perf-slaGrid').innerHTML = `
+  document.getElementById('perfL-slaGrid').innerHTML = `
     <div class="sec-card">
       <div class="sec-title">🎯 SLA e FCR por Agente
         <span class="sec-title-badge" style="font-size:10px;color:var(--muted)">🟢 ≥80% &nbsp; 🟡 50–79% &nbsp; 🔴 &lt;50%</span>
@@ -1332,7 +1333,7 @@ function renderPerf() {
 
   // Violations
   const maxViol = Math.max(...agents.map(a => PERF_DATA[a].violacoes_resolucao));
-  document.getElementById('perf-violGrid').innerHTML = `
+  document.getElementById('perfL-violGrid').innerHTML = `
     <div class="sec-card">
       <div class="sec-title">🚨 Violações de SLA — Resolução</div>
       ${agents.map(ag => {
@@ -1387,7 +1388,7 @@ function renderPerf() {
       <td style="color:${p.color}">${p.handling_pct}%</td>
     </tr>`;
   }).join('');
-  document.getElementById('perf-table').innerHTML = `
+  document.getElementById('perfL-table').innerHTML = `
     <div class="sec-title">📋 Tabela Completa de Performance — 6 meses</div>
     <div style="overflow-x:auto">
     <table class="data-table">
@@ -1400,13 +1401,216 @@ function renderPerf() {
     </table></div>`;
 }
 
+
+// ====== PERFORMANCE (Freshdesk + BuyGoods, diário / semanal / mensal) ======
+const PERF_GRAN = {
+  dia:    { label: 'Dia',    atual: 'Último dia',     anterior: 'dia anterior',    max: 31 },
+  semana: { label: 'Semana', atual: 'Última semana',  anterior: 'semana anterior', max: 16 },
+  mes:    { label: 'Mês',    atual: 'Último mês',     anterior: 'mês anterior',    max: 24 },
+};
+const PERF_METRICS = {
+  res:    { label: 'Resolvidos (FD + BG)', get: r => r.fdRes + r.bgRes },
+  fdRes:  { label: 'Resolvidos Freshdesk', get: r => r.fdRes },
+  bgRes:  { label: 'Resolvidos BuyGoods (est.)', get: r => r.bgRes },
+  resp:   { label: 'Respostas Freshdesk', get: r => r.resp },
+  valor:  { label: 'Valor em pedidos (FD)', get: r => r.valor, money: true },
+};
+const MESES = ['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+let perfGran = 'semana', perfMetric = 'res';
+
+function perfBucket(day) {
+  if (perfGran === 'dia') return day;
+  if (perfGran === 'mes') return day.slice(0, 7);
+  const d = new Date(day + 'T12:00:00');
+  d.setDate(d.getDate() - (d.getDay() + 6) % 7);   // segunda-feira
+  return toDateKey(d);
+}
+function perfBucketLabel(b) {
+  if (perfGran === 'dia') { const d = new Date(b + 'T12:00:00'); return `${['dom','seg','ter','qua','qui','sex','sáb'][d.getDay()]} ${fmtShort(b)}`; }
+  if (perfGran === 'mes') return `${MESES[+b.slice(5, 7) - 1]}/${b.slice(0, 4)}`;
+  const e = new Date(b + 'T12:00:00'); e.setDate(e.getDate() + 4);
+  return `${fmtShort(b)}–${fmtShort(toDateKey(e))}`;
+}
+function perfEmpty() { return { fdRes: 0, bgRes: 0, resp: 0, cri: 0, valor: 0, upsell: 0 }; }
+function perfAdd(a, b) { for (const k in a) a[k] += b[k] || 0; return a; }
+
+function perfBuild() {
+  const fdDays = Object.keys(DATA_FD).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k));
+  const bgDias = (DATA_BG && DATA_BG.dias) || {};
+  const allDays = [...new Set([...fdDays, ...Object.keys(bgDias)])].sort();
+  const buckets = {};
+  for (const day of allDays) {
+    const b = perfBucket(day);
+    const B = buckets[b] = buckets[b] || { key: b, dias: new Set(), fdDias: 0, bgDias: 0, ag: Object.fromEntries(AGENTS.map(a => [a, perfEmpty()])) };
+    const fd = DATA_FD[day], bg = bgDias[day];
+    if (fd) B.fdDias++;
+    if (bg) B.bgDias++;
+    if (fd || bg) B.dias.add(day);
+    for (const ag of AGENTS) {
+      const f = (fd || {})[ag] || {}, g = ((bg || {}).agents || {})[ag] || {};
+      perfAdd(B.ag[ag], {
+        fdRes: f.resolvidos_atividade ?? f.fechados ?? 0,
+        bgRes: g.resolvidos || 0,
+        resp:  f.tickets_trabalhados || 0,
+        cri:   f.tickets_criados || 0,
+        valor: f.valor_total || 0,
+        upsell: f.upsell || 0,
+      });
+    }
+  }
+  const list = Object.values(buckets).sort((a, b) => a.key < b.key ? -1 : 1);
+  for (const B of list) B.tot = AGENTS.reduce((t, a) => perfAdd(t, B.ag[a]), perfEmpty());
+  return list.slice(-PERF_GRAN[perfGran].max);
+}
+
+function perfDelta(cur, prev) {
+  if (!prev) return '<span style="color:var(--muted)">—</span>';  // sem base para comparar
+  const pct = Math.round((cur - prev) / prev * 100);
+  const c = pct > 0 ? '#34c759' : pct < 0 ? '#ff3b30' : 'var(--muted)';
+  return `<span style="color:${c}">${pct > 0 ? '▲' : pct < 0 ? '▼' : '='} ${Math.abs(pct)}%</span>`;
+}
+function perfFmt(v, money) {
+  return money ? `$${Math.round(v).toLocaleString('pt-BR')}` : Math.round(v).toLocaleString('pt-BR');
+}
+
+function perfChart(list) {
+  const m = PERF_METRICS[perfMetric];
+  if (list.length < 2) return '<div style="color:var(--muted);font-size:12px;padding:8px 0">Poucos períodos para desenhar a linha.</div>';
+  const W = 760, H = 220, PL = 44, PR = 16, PT = 14, PB = 30;
+  const max = Math.max(1, ...list.flatMap(B => AGENTS.map(a => m.get(B.ag[a]))));
+  const x = i => PL + i * (W - PL - PR) / (list.length - 1);
+  const y = v => PT + (1 - v / max) * (H - PT - PB);
+  const ticks = [0, 0.5, 1].map(f => max * f);
+  const every = Math.ceil(list.length / 8);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block" role="img" aria-label="${m.label} por agente">
+    ${ticks.map(t => `<line x1="${PL}" x2="${W - PR}" y1="${y(t)}" y2="${y(t)}" stroke="var(--border)"/>
+      <text x="${PL - 6}" y="${y(t) + 3}" font-size="10" fill="var(--muted)" text-anchor="end">${perfFmt(t, m.money)}</text>`).join('')}
+    ${list.map((B, i) => i % every && i !== list.length - 1 ? '' :
+      `<text x="${x(i)}" y="${H - 10}" font-size="10" fill="var(--muted)" text-anchor="${i === 0 ? 'start' : i === list.length - 1 ? 'end' : 'middle'}">${perfBucketLabel(B.key)}</text>`).join('')}
+    ${AGENTS.map(a => `<path d="${list.map((B, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(m.get(B.ag[a])).toFixed(1)}`).join(' ')}"
+        fill="none" stroke="${AGENT_CFG[a].color}" stroke-width="2.2" stroke-linejoin="round"/>
+      ${list.map((B, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(m.get(B.ag[a])).toFixed(1)}" r="2.6" fill="${AGENT_CFG[a].color}"><title>${a} · ${perfBucketLabel(B.key)}: ${perfFmt(m.get(B.ag[a]), m.money)}</title></circle>`).join('')}`).join('')}
+  </svg>
+  <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:11px;margin-top:6px">
+    ${AGENTS.map(a => `<span style="color:${AGENT_CFG[a].color};font-weight:600">● ${a}</span>`).join('')}
+  </div>`;
+}
+
+function setPerfGran(g) { perfGran = g; renderPerf(); }
+function setPerfMetric(m) { perfMetric = m; renderPerf(); }
+
+function renderPerf() {
+  const full = perfBuild();
+  let lastFd = full.length - 1;
+  while (lastFd > 0 && !full[lastFd].fdDias) lastFd--;
+  const list = full.slice(0, lastFd + 1);
+  const G = PERF_GRAN[perfGran];
+  document.getElementById('perf-controls').innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span class="period-label">Agrupar por</span>
+      <div class="period-group">${Object.entries(PERF_GRAN).map(([k, v]) =>
+        `<button class="pbtn${k === perfGran ? ' active' : ''}" onclick="setPerfGran('${k}')">${v.label}</button>`).join('')}</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted)">Freshdesk: EOD diário (desde ${fmtShort(Object.keys(DATA_FD).filter(k => /^\d{4}-/.test(k)).sort()[0])}) · BuyGoods: robô da fila (desde ${fmtShort(Object.keys((DATA_BG && DATA_BG.dias) || {}).sort()[0] || getHoje())}) · mostrando os últimos ${list.length} períodos</div>`;
+  if (!list.length) { document.getElementById('perf-kpis').innerHTML = '<div class="sec-card">Sem dados.</div>'; return; }
+  if (lastFd < full.length - 1) document.getElementById('perf-controls').innerHTML +=
+    `<div style="flex-basis:100%;font-size:11px;color:#92620a">📋 ${perfBucketLabel(full[full.length - 1].key)} ainda sem Freshdesk (chega no EOD 17h) — mostrando até ${perfBucketLabel(list[list.length - 1].key)}.</div>`;
+
+  const cur = list[list.length - 1], prev = list[list.length - 2];
+  const parcial = perfGran !== 'dia' && cur.key === perfBucket(getHoje());
+  // período em andamento: compara o ritmo por dia, não o total
+  const ritmo = (v, B) => parcial ? v / Math.max(B.fdDias, 1) : v;
+  const vs = (v, pv) => pv == null ? '' : '· ' + perfDelta(ritmo(v, cur), prev ? ritmo(pv, prev) : 0) + (parcial ? ' ritmo/dia' : '') + ' vs ' + G.anterior;
+  const ct = cur.tot, pt = prev ? prev.tot : null;
+  const nDias = Math.max(cur.fdDias, 1);
+  document.getElementById('perf-kpis').innerHTML = [
+    { label: 'Resolvidos (FD + BG)',   v: ct.fdRes + ct.bgRes, p: pt && pt.fdRes + pt.bgRes, color: '#34c759' },
+    { label: 'Resolvidos Freshdesk',   v: ct.fdRes,  p: pt && pt.fdRes,  color: '#007aff' },
+    { label: 'Resolvidos BuyGoods',    v: ct.bgRes,  p: pt && pt.bgRes,  color: '#ff9500', sub: 'estimado' },
+    { label: 'Respostas Freshdesk',    v: ct.resp,   p: pt && pt.resp,   color: '#5ac8fa' },
+    { label: 'Valor em Pedidos',       v: ct.valor,  p: pt && pt.valor,  color: '#af52de', money: true },
+    { label: 'Resolvidos / agente / dia', v: Math.round((ct.fdRes + ct.bgRes) / AGENTS.length / nDias * 10) / 10, p: null, color: '#30d158', raw: true, sub: `${cur.fdDias} dia(s) com dados` },
+  ].map(k => `<div class="kpi-card" style="--kpi-color:${k.color}">
+    <div class="kpi-label">${k.label}</div>
+    <div class="kpi-value" style="font-size:${k.money ? '22px' : '28px'}">${k.raw ? String(k.v).replace('.', ',') : perfFmt(k.v, k.money)}</div>
+    <div class="kpi-sub">${k.sub ? k.sub + ' · ' : ''}${perfBucketLabel(cur.key)}${parcial ? ' (parcial)' : ''} ${vs(k.v, k.p)}</div>
+  </div>`).join('');
+
+  document.getElementById('perf-agentCards').innerHTML = AGENTS.map(ag => {
+    const a = cur.ag[ag], p = prev ? prev.ag[ag] : null, color = AGENT_CFG[ag].color;
+    const res = a.fdRes + a.bgRes;
+    return `<div class="agent-card" style="--ac:${color}">
+      <div class="agent-name">${ag}</div>
+      <div class="agent-role">${G.atual}: ${perfBucketLabel(cur.key)}${parcial ? ' (parcial)' : ''}</div>
+      <div class="ag-stats">
+        <div><div class="ag-stat-label">Resolvidos</div><div class="ag-stat-val" style="color:#34c759">${res}</div></div>
+        <div><div class="ag-stat-label">Respostas</div><div class="ag-stat-val" style="color:${color}">${a.resp}</div></div>
+        <div><div class="ag-stat-label">Por dia</div><div class="ag-stat-val">${String(Math.round(res / nDias * 10) / 10).replace('.', ',')}</div></div>
+      </div>
+      <div style="margin:8px 0 4px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:flex">
+        <div style="width:${res ? Math.round(a.fdRes / res * 100) : 0}%;background:#007aff"></div>
+        <div style="width:${res ? Math.round(a.bgRes / res * 100) : 0}%;background:#ff9500"></div>
+      </div>
+      <div class="ag-bottom">
+        <div><div class="ag-b-label">🎫 FD</div><div class="ag-b-val" style="color:#007aff">${a.fdRes}</div></div>
+        <div><div class="ag-b-label">🛒 BG</div><div class="ag-b-val" style="color:#ff9500">${a.bgRes}</div></div>
+        <div><div class="ag-b-label">vs ${G.anterior}</div><div class="ag-b-val" style="font-size:12px">${p ? perfDelta(ritmo(res, cur), ritmo(p.fdRes + p.bgRes, prev)) : '—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('perf-chart').innerHTML = `
+    <div class="sec-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <span>📈 Evolução por ${G.label.toLowerCase()} — ${PERF_METRICS[perfMetric].label}</span>
+      <select onchange="setPerfMetric(this.value)" style="font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)">
+        ${Object.entries(PERF_METRICS).map(([k, v]) => `<option value="${k}"${k === perfMetric ? ' selected' : ''}>${v.label}</option>`).join('')}
+      </select>
+    </div>
+    ${perfChart(list)}`;
+
+  // Ranking no recorte mostrado
+  const sum = Object.fromEntries(AGENTS.map(a => [a, list.reduce((t, B) => perfAdd(t, B.ag[a]), perfEmpty())]));
+  const totRes = AGENTS.reduce((t, a) => t + sum[a].fdRes + sum[a].bgRes, 0) || 1;
+  const fdDiasTot = Math.max(1, list.reduce((t, B) => t + B.fdDias, 0));
+  const rank = AGENTS.slice().sort((a, b) => (sum[b].fdRes + sum[b].bgRes) - (sum[a].fdRes + sum[a].bgRes));
+  document.getElementById('perf-rank').innerHTML = `
+    <div class="sec-title">🏆 Acumulado dos últimos ${list.length} períodos (${perfBucketLabel(list[0].key)} → ${perfBucketLabel(cur.key)})</div>
+    <div style="overflow-x:auto"><table class="data-table">
+      <thead><tr><th>Agente</th><th>🎫 Resolvidos</th><th>🛒 Resolvidos (est.)</th><th>Resolvidos total</th><th>% do time</th><th>Média/dia</th><th>🎫 Respostas</th><th>🎫 Criados</th><th>Upsell</th><th>Valor em pedidos</th></tr></thead>
+      <tbody>${rank.map(a => { const s = sum[a], r = s.fdRes + s.bgRes; return `<tr>
+        <td style="font-weight:700;color:${AGENT_CFG[a].color}">${a}</td><td>${s.fdRes}</td><td>${s.bgRes}</td>
+        <td style="color:#34c759;font-weight:700">${r}</td><td>${Math.round(r / totRes * 100)}%</td>
+        <td>${String(Math.round(r / fdDiasTot * 10) / 10).replace('.', ',')}</td>
+        <td>${s.resp}</td><td>${s.cri}</td><td>${s.upsell}</td><td>${perfFmt(s.valor, true)}</td></tr>`; }).join('')}
+      </tbody></table></div>`;
+
+  // Tabela por período
+  document.getElementById('perf-table').innerHTML = `
+    <div class="sec-title">📋 Resolvidos por ${G.label.toLowerCase()} e agente <span style="font-size:10px;color:var(--muted);font-weight:400">total (🎫 FD · 🛒 BG)</span></div>
+    <div style="overflow-x:auto"><table class="data-table">
+      <thead><tr><th>${G.label}</th><th>Dias</th>${AGENTS.map(a => `<th style="color:${AGENT_CFG[a].color}">${a}</th>`).join('')}<th>Time</th><th>🎫 Respostas</th><th>Valor</th></tr></thead>
+      <tbody>${list.slice().reverse().map(B => `<tr>
+        <td style="font-weight:600;white-space:nowrap">${perfBucketLabel(B.key)}${B === cur && parcial ? ' <span style="font-size:10px;color:var(--muted)">(parcial)</span>' : ''}</td>
+        <td style="color:var(--muted)">${B.fdDias}</td>
+        ${AGENTS.map(a => { const r = B.ag[a]; return `<td><strong>${r.fdRes + r.bgRes}</strong> <span style="font-size:10px;color:var(--muted)">(${r.fdRes} · ${r.bgRes})</span></td>`; }).join('')}
+        <td style="color:#34c759;font-weight:700">${B.tot.fdRes + B.tot.bgRes}</td><td>${B.tot.resp}</td><td>${perfFmt(B.tot.valor, true)}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">
+      ℹ️ <strong>Freshdesk</strong>: resolvidos = tickets do grupo que ficaram Resolved/Closed no dia; respostas = tickets trabalhados no dia (EOD 17h/22h).
+      <strong>BuyGoods</strong>: resolvidos estimados pela saída do ticket da fila entre duas leituras do robô (dados a partir de ${fmtShort(Object.keys((DATA_BG && DATA_BG.dias) || {}).sort()[0] || getHoje())}; antes disso a coluna BG é 0).
+      "Dias" conta os dias com dados do Freshdesk; a média/dia usa esse número.
+    </div>`;
+
+  renderPerfLegado();
+}
+
 // ====== VIEW SWITCHING ======
 
 
 function switchView(view) {
   currentView = view;
   document.getElementById('view-morning').style.display     = view === 'morning'     ? 'block' : 'none';
-  document.getElementById('view-forms').style.display       = view === 'forms'       ? 'block' : 'none';
   document.getElementById('view-freshdesk').style.display   = view === 'freshdesk'   ? 'block' : 'none';
   document.getElementById('view-performance').style.display = view === 'performance' ? 'block' : 'none';
   document.getElementById('view-geral').style.display       = view === 'geral'       ? 'block' : 'none';
@@ -1415,14 +1619,12 @@ function switchView(view) {
   document.getElementById('tabBG').classList.toggle('active',    view === 'buygoods');
   if (view !== 'geral' && view !== 'buygoods') document.getElementById('weekendBanner').style.display = 'none';
   document.getElementById('tabMorning').classList.toggle('active', view === 'morning');
-  document.getElementById('tabForms').classList.toggle('active',   view === 'forms');
   document.getElementById('tabFD').classList.toggle('active',      view === 'freshdesk');
   document.getElementById('tabPerf').classList.toggle('active',    view === 'performance');
   // Hide period bar on Morning Brief (it has its own context), show on all others
-  document.getElementById('periodBar').style.display = view === 'morning' ? 'none' : '';
+  document.getElementById('periodBar').style.display = (view === 'morning' || view === 'performance') ? 'none' : '';
   if      (view === 'morning')     renderMorning();
   else if (view === 'freshdesk')   renderFD();
-  else if (view === 'forms')       renderAll();
   else if (view === 'performance') renderPerf();
   else if (view === 'geral')       renderGeral();
   else if (view === 'buygoods')    renderBG();
