@@ -1,0 +1,140 @@
+{
+ "atualizado_em": "2026-10-21 16:59",
+ "fonte": "contagens do helpdesk BuyGoods",
+ "dias": {
+  "2026-10-06": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 14,
+    "NervoLyn": 2,
+    "AudiLeaf": 7,
+    "BreatheaseX": 5,
+    "FloraNew": 2
+   }
+  },
+  "2026-10-07": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 32,
+    "NervoLyn": 5,
+    "AudiLeaf": 7,
+    "MaroBrain": 1,
+    "BreatheaseX": 6,
+    "BakingSlim": 1,
+    "VigorLong": 1
+   }
+  },
+  "2026-10-08": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 16,
+    "NailsCleanPro": 1,
+    "NervoLyn": 1,
+    "AudiLeaf": 3,
+    "MaroBrain": 3,
+    "BreatheaseX": 7,
+    "FloraNew": 2,
+    "BakingSlim": 1,
+    "Prostafense": 1,
+    "PressureCalmX": 1,
+    "VisiumPro": 1,
+    "VigorLong": 1
+   }
+  },
+  "2026-10-09": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 6,
+    "BreatheaseX": 6,
+    "NervoLyn": 1,
+    "MaroBrain": 7,
+    "AudiLeaf": 6,
+    "Prostafense": 2,
+    "FloraNew": 3
+   }
+  },
+  "2026-10-10": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 17,
+    "BreatheaseX": 10,
+    "NervoLyn": 10,
+    "MaroBrain": 4,
+    "AudiLeaf": 2,
+    "FloraNew": 5,
+    "AlphaErec": 2,
+    "VisiumPro": 1
+   }
+  },
+  "2026-10-11": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 7,
+    "BreatheaseX": 9,
+    "NervoLyn": 2,
+    "MaroBrain": 4,
+    "AudiLeaf": 7,
+    "Prostafense": 1,
+    "FloraNew": 5,
+    "BakingSlim": 2,
+    "AlphaErec": 5,
+    "VisiumPro": 3
+   }
+  },
+  "2026-10-12": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "SodaHorsePeak": 4,
+    "NailsCleanPro": 9,
+    "MaroBrain": 9,
+    "NervoLyn": 9,
+    "AudiLeaf": 7,
+    "Prostafense": 1,
+    "BreatheaseX": 7,
+    "FloraNew": 5,
+    "BakingSlim": 2,
+    "VisiumPro": 1,
+    "AlphaErec": 5,
+    "PressureCalmX": 8,
+    "GlucoRecover": 1,
+    "Booster XT": 1,
+    "VigorLong": 1
+   }
+  },
+  "2026-10-13": {
+   "lido_em": "2026-10-21 16:59",
+   "origem": "Painel de Tickets BG (aba Dados, manual)",
+   "sem_leitura": [],
+   "produtos": {
+    "NailsCleanPro": 15,
+    "MaroBrain": 10,
+    "NervoLyn": 6,
+    "AudiLeaf": 9,
+    "Prostafense": 1,
+    "BreatheaseX": 24,
+    "FloraNew": 13,
+    "BakingSlim": 1,
+    "VisiumPro": 5,
+    "AlphaErec": 8,
+    "PressureCalmX": 4,
+    "GoldenSkinPro": 2,
+    "IronPulseX": 1,
+    "Booster XT": 1
+   }
+  }
+ }
+}
