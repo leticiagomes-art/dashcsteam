@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-21 16:59",
+ "atualizado_em": "2026-10-21 17:07",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -134,6 +134,26 @@
     "GoldenSkinPro": 2,
     "IronPulseX": 1,
     "Booster XT": 1
+   }
+  },
+  "2026-10-20": {
+   "lido_em": "2026-10-21 17:07",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "AlphaErec": 1,
+    "Audileaf": 3,
+    "BreathEaseX": 6,
+    "FloraNew": 3,
+    "Gluco Recover": 3,
+    "GoldenSkinPro": 1,
+    "Marobrain": 4,
+    "NailsCleanPro": 2,
+    "Nervolyn": 7,
+    "Prostafense": 2,
+    "SodaHorsePeak": 14,
+    "Vigorlong": 3,
+    "Visium Pro": 3
    }
   }
  }
