@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-23 07:25",
+ "atualizado_em": "2026-10-23 07:42",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -171,6 +171,21 @@
     "Nervolyn": 3,
     "PressureCalmX": 1,
     "SodaHorsePeak": 17,
+    "Vigorlong": 2
+   }
+  },
+  "2026-10-22": {
+   "lido_em": "2026-10-23 07:42",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "Audileaf": 2,
+    "BreathEaseX": 2,
+    "Marobrain": 1,
+    "NailsCleanPro": 1,
+    "Nervolyn": 2,
+    "PressureCalmX": 3,
+    "SodaHorsePeak": 8,
     "Vigorlong": 2
    }
   }
