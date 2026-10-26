@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-23 07:42",
+ "atualizado_em": "2026-10-26 08:01",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -188,6 +188,12 @@
     "SodaHorsePeak": 8,
     "Vigorlong": 2
    }
+  },
+  "2026-10-24": {
+   "lido_em": "2026-10-26 08:01",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {}
   }
  }
 }
