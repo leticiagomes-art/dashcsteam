@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-27 08:15",
+ "atualizado_em": "2026-10-29 08:30",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -212,39 +212,22 @@
    }
   },
   "2026-10-26": {
-   "lido_em": "2026-10-27 08:15",
+   "lido_em": "2026-10-29 08:30",
    "origem": "robô",
-   "sem_leitura": [
-    "AlphaErec",
-    "AudiQuiet",
-    "BakingSlim",
-    "Booster XT",
-    "Erectrozil",
-    "EyeVitalis",
-    "Gluco Recover",
-    "GlycoMelt",
-    "GoldenSkinPro",
-    "IronPulseX",
-    "LipoBliss",
-    "LipoPeak",
-    "LipoTrine",
-    "LipoVive",
-    "MounjaMelt",
-    "PressureCalmX",
-    "Prostafense",
-    "Prostaliss",
-    "Reduburn",
-    "SkinRenewPro",
-    "VigorLong",
-    "Visium Pro"
-   ],
+   "sem_leitura": [],
    "produtos": {
-    "Audileaf": 4,
-    "BreathEaseX": 4,
-    "FloraNew": 2,
+    "AlphaErec": 1,
+    "Audileaf": 7,
+    "BakingSlim": 1,
+    "BreathEaseX": 8,
+    "FloraNew": 5,
+    "Gluco Recover": 1,
+    "Marobrain": 5,
     "NailsCleanPro": 2,
-    "Nervolyn": 2,
-    "SodaHorsePeak": 7
+    "Nervolyn": 7,
+    "PressureCalmX": 2,
+    "SodaHorsePeak": 13,
+    "Visium Pro": 1
    }
   }
  }
