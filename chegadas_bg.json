@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-29 08:45",
+ "atualizado_em": "2026-10-31 07:16",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -247,6 +247,23 @@
     "SodaHorsePeak": 16,
     "Vigorlong": 2,
     "Visium Pro": 1
+   }
+  },
+  "2026-10-29": {
+   "lido_em": "2026-10-31 07:16",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "Audileaf": 8,
+    "BreathEaseX": 6,
+    "Marobrain": 4,
+    "MatchaGlide": 1,
+    "NailsCleanPro": 6,
+    "Nervolyn": 1,
+    "Prostafense": 2,
+    "SodaHorsePeak": 12,
+    "Vigorlong": 1,
+    "Visium Pro": 3
    }
   }
  }
