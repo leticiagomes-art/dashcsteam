@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-02 07:08",
+ "atualizado_em": "2026-11-02 07:13",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -284,6 +284,12 @@
   },
   "2026-10-31": {
    "lido_em": "2026-11-02 07:08",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {}
+  },
+  "2026-11-01": {
+   "lido_em": "2026-11-02 07:13",
    "origem": "robô",
    "sem_leitura": [],
    "produtos": {}
