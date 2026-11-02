@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-10-31 07:28",
+ "atualizado_em": "2026-11-02 07:08",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -281,6 +281,12 @@
     "SodaHorsePeak": 4,
     "Visium Pro": 1
    }
+  },
+  "2026-10-31": {
+   "lido_em": "2026-11-02 07:08",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {}
   }
  }
 }
