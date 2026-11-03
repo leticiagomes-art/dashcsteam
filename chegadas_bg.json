@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-02 07:13",
+ "atualizado_em": "2026-11-03 07:33",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -289,10 +289,17 @@
    "produtos": {}
   },
   "2026-11-01": {
-   "lido_em": "2026-11-02 07:13",
+   "lido_em": "2026-11-03 07:33",
    "origem": "robô",
    "sem_leitura": [],
-   "produtos": {}
+   "produtos": {
+    "Audileaf": 1,
+    "BreathEaseX": 1,
+    "Marobrain": 1,
+    "NailsCleanPro": 2,
+    "SodaHorsePeak": 7,
+    "Visium Pro": 1
+   }
   }
  }
 }
