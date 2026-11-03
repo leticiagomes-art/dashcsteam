@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-03 07:33",
+ "atualizado_em": "2026-11-03 07:41",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -298,6 +298,17 @@
     "Marobrain": 1,
     "NailsCleanPro": 2,
     "SodaHorsePeak": 7,
+    "Visium Pro": 1
+   }
+  },
+  "2026-11-02": {
+   "lido_em": "2026-11-03 07:41",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "AlphaErec": 1,
+    "FloraNew": 1,
+    "NailsCleanPro": 1,
     "Visium Pro": 1
    }
   }
