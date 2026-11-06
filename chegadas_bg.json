@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-05 08:32",
+ "atualizado_em": "2026-11-06 08:16",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -349,6 +349,40 @@
     "NailsCleanPro": 12,
     "Nervolyn": 4,
     "SodaHorsePeak": 10
+   }
+  },
+  "2026-11-04": {
+   "lido_em": "2026-11-06 08:16",
+   "origem": "robô",
+   "sem_leitura": [
+    "AudiQuiet",
+    "Erectrozil",
+    "EyeVitalis",
+    "GlycoMelt",
+    "GoldenSkinPro",
+    "IronPulseX",
+    "JointReliveX",
+    "LipoBliss",
+    "LipoPeak",
+    "LipoTrine",
+    "LipoVive",
+    "MatchaGlide",
+    "MounjaMelt",
+    "Nails Clean",
+    "Prostaliss",
+    "Reduburn",
+    "SkinRenewPro",
+    "VigorTitan"
+   ],
+   "produtos": {
+    "Audileaf": 1,
+    "BreathEaseX": 11,
+    "FloraNew": 1,
+    "Marobrain": 8,
+    "NailsCleanPro": 7,
+    "Nervolyn": 1,
+    "SodaHorsePeak": 1,
+    "Visium Pro": 6
    }
   }
  }
