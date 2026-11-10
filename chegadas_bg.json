@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-06 08:16",
+ "atualizado_em": "2026-11-10 07:44",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -383,6 +383,20 @@
     "Nervolyn": 1,
     "SodaHorsePeak": 1,
     "Visium Pro": 6
+   }
+  },
+  "2026-11-08": {
+   "lido_em": "2026-11-10 07:44",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "BreathEaseX": 1,
+    "FloraNew": 1,
+    "Marobrain": 2,
+    "MatchaGlide": 1,
+    "Prostafense": 1,
+    "SodaHorsePeak": 1,
+    "Visium Pro": 1
    }
   }
  }
