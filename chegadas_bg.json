@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-10 08:28",
+ "atualizado_em": "2026-11-11 08:10",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -400,58 +400,43 @@
    }
   },
   "2026-11-09": {
-   "lido_em": "2026-11-10 08:28",
+   "lido_em": "2026-11-11 08:10",
    "origem": "robô",
    "sem_leitura": [
-    "AlphaErec",
     "AudiQuiet",
-    "BakingSlim",
-    "Booster XT",
     "BullSodaRise",
     "DM Gummies",
     "EchoSoothe",
-    "Erectrozil",
-    "EyeVitalis",
-    "FloraNew",
-    "Gluco Recover",
     "GlycePrime",
-    "GlycoMelt",
-    "GoldenSkinPro",
     "HoneyCog",
-    "IronPulseX",
     "JointReliveX",
-    "LipoBliss",
-    "LipoPeak",
     "LipoTrine",
     "LipoVive",
     "LungNew",
-    "MaroBrain",
     "MatchaGlide",
     "MemoryCept",
-    "MounjaMelt",
     "Nails Clean",
     "Nervumin",
     "NeuroRetine",
     "Oatzem",
     "OraGlowPro",
-    "PressureCalmX",
-    "Prostafense",
-    "Prostaliss",
     "Reduburn",
-    "SkinRenewPro",
     "SodaHorsePump",
     "TitanHoney",
     "VapoMend",
-    "VigorLong",
-    "VigorTitan",
-    "Visium Pro"
+    "VigorTitan"
    ],
    "produtos": {
-    "Audileaf": 3,
-    "BreathEaseX": 2,
-    "NailsCleanPro": 4,
-    "Nervolyn": 2,
-    "SodaHorsePeak": 1
+    "Audileaf": 7,
+    "BreathEaseX": 3,
+    "Marobrain": 9,
+    "NailsCleanPro": 6,
+    "Nervolyn": 4,
+    "PressureCalmX": 1,
+    "Prostafense": 2,
+    "SodaHorsePeak": 3,
+    "Vigorlong": 2,
+    "Visium Pro": 2
    }
   }
  }
