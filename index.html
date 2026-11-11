@@ -1759,6 +1759,18 @@ function filaLink(href, txt) {
   return /^https:\/\/[^\s"<>]+$/.test(href || '') ? `<a href="${filaEsc(href)}" target="_blank" rel="noopener noreferrer">${filaEsc(txt)}</a>` : filaEsc(txt);
 }
 function setFilaFiltro(i) { const ag = (window._filaAgs || [])[i] || ''; filaFiltro = filaFiltro === ag ? '' : ag; renderFila(); }
+// "✓ respondi": marca só no navegador de quem clicou (localStorage), até a próxima leitura do robô confirmar.
+// Se o robô ler a fila DEPOIS da marca e o ticket continuar na lista, a marca cai (cliente escreveu de novo
+// ou a resposta não saiu).
+function filaRespLer() { try { return JSON.parse(localStorage.getItem('filaResp') || '{}') || {}; } catch (e) { return {}; } }
+function filaRespGravar(m) { try { localStorage.setItem('filaResp', JSON.stringify(m)); } catch (e) {} }
+function filaQuando(txt) { const m = /(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/.exec(txt || ''); return m ? new Date(+m[3], +m[2] - 1, +m[1], +m[4], +m[5]).getTime() : 0; }
+function filaResp(i) {
+  const r = (window._filaLista || [])[i]; if (!r) return;
+  const m = filaRespLer(), k = r.ticket_link || r.ticket;
+  if (m[k]) delete m[k]; else m[k] = Date.now();
+  filaRespGravar(m); renderFila();
+}
 function renderFila() {
   const D = (typeof DATA_FILA !== 'undefined') ? DATA_FILA : null;
   if (!D || !D.rows) {
@@ -1799,18 +1811,36 @@ function renderFila() {
       </div>
     </div>`;
   }).join('');
-  const lista = rows.filter(r => !filaFiltro || r.atendente === filaFiltro);
+  // marcas "✓ respondi" ainda válidas (feitas depois da última leitura do robô daquela plataforma)
+  const marcas = filaRespLer(), leitura = { BuyGoods: filaQuando(D.atualizado_em), Freshdesk: filaQuando(D.freshdesk_em) };
+  for (const k of Object.keys(marcas)) if (Date.now() - marcas[k] > 2 * 86400000) delete marcas[k];
+  const resp = r => { const t = marcas[r.ticket_link || r.ticket]; return !!t && t > (leitura[r.plataforma] || 0); };
+  for (const r of todas) { const k = r.ticket_link || r.ticket; if (marcas[k] && !resp(r)) delete marcas[k]; }
+  filaRespGravar(marcas);
+  const lista = rows.filter(r => !filaFiltro || r.atendente === filaFiltro)
+    .map((r, i) => ({ r, i, ok: resp(r) })).sort((a, b) => (a.ok - b.ok) || (a.i - b.i)).map(x => x.r);
+  window._filaLista = lista;
+  const nResp = lista.filter(resp).length;
   const iFiltro = ags.indexOf(filaFiltro);
   document.getElementById('fila-lista').innerHTML = `
-    <div class="sec-title">🧾 Tickets esperando resposta · ${filaFiltro ? filaEsc(filaFiltro) + ` <a href="javascript:void(0)" onclick="setFilaFiltro(${iFiltro})" style="font-size:11px;color:#007aff;font-weight:600;margin-left:6px">ver todos</a>` : 'todos'} (${lista.length})</div>
+    <div class="sec-title">🧾 Tickets esperando resposta · ${filaFiltro ? filaEsc(filaFiltro) + ` <a href="javascript:void(0)" onclick="setFilaFiltro(${iFiltro})" style="font-size:11px;color:#007aff;font-weight:600;margin-left:6px">ver todos</a>` : 'todos'} (${lista.length}${nResp ? ` · <span style="color:#34c759">${nResp} respondido${nResp > 1 ? 's' : ''} por você</span>` : ''})</div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
       ${['', 'BuyGoods', 'Freshdesk'].map(v => `<button class="pbtn${filaPlat === v ? ' active' : ''}" onclick="setFilaPlat('${v}')">${v === '' ? 'Todas' : v === 'BuyGoods' ? '🛒 BuyGoods' : '🎫 Freshdesk'}</button>`).join('')}
     </div>
     <div style="overflow-x:auto"><table class="data-table fila-table">
-      <thead><tr><th>Ticket</th><th>Atendente</th><th>Situação</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th></tr></thead>
-      <tbody>${lista.map(r => {
+      <thead><tr><th>Ticket</th><th>Atendente</th><th>Situação</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th><th></th></tr></thead>
+      <tbody>${lista.map((r, i) => {
         const h = Number(r.espera_h), cor = h >= LIM ? '#ff3b30' : h >= LIM - 6 ? '#ff9500' : 'var(--text)';
         const al = [r.problema, r.reembolso].filter(Boolean).join(' · ');
+        const ok = resp(r);
+        const botao = `<button class="pbtn${ok ? ' active' : ''}" style="padding:3px 10px;font-size:11px;white-space:nowrap;${ok ? 'background:#34c759;border-color:#34c759' : ''}" onclick="filaResp(${i})" title="${ok ? 'desfazer' : 'marca como respondido até a próxima leitura do robô'}">${ok ? '✓ respondido' : '✓ respondi'}</button>`;
+        if (ok) return `<tr style="background:rgba(52,199,89,.12)">
+          <td style="white-space:nowrap">${r.plataforma === 'Freshdesk' ? '🎫' : '🛒'} ${filaLink(r.ticket_link, r.ticket)}</td>
+          <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}</td>
+          <td><span class="fila-chip" style="color:#34c759;border-color:#34c759;font-weight:700">respondido</span></td>
+          <td colspan="6" style="color:var(--muted);font-size:11px">o robô confirma na próxima leitura (de hora em hora) e o ticket sai da lista</td>
+          <td>${botao}</td>
+        </tr>`;
         return `<tr>
           <td style="white-space:nowrap">${r.plataforma === 'Freshdesk' ? '🎫' : '🛒'} ${filaLink(r.ticket_link, r.ticket)}</td>
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}${r.clamado === 'sim' ? '' : ' <span style="color:var(--muted);font-weight:400;font-size:10px">(sem claim)</span>'}</td>
@@ -1821,12 +1851,14 @@ function renderFila() {
           <td style="color:#ff3b30">${filaEsc(al)}</td>
           <td style="color:var(--muted)">${r.n_pedidos || ''}</td>
           <td style="white-space:nowrap">${r.cliente_link ? filaLink(r.cliente_link, 'ver cliente') : ''}</td>
-        </tr>`; }).join('') || '<tr><td colspan="9" style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
+          <td>${botao}</td>
+        </tr>`; }).join('') || '<tr><td colspan="10" style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
     </table></div>
     <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">
       ℹ️ <strong>Como ler:</strong> mais antigo primeiro. <strong>Espera</strong> em horas úteis (seg–sex) desde a última mensagem do cliente; vermelho = acima de 24h.
       <strong>Não lido</strong> = ninguém abriu; <strong>aberto sem resposta</strong> = alguém abriu, mas o cliente não recebeu resposta. "(sem claim)" = parte que o robô deu a essa pessoa para clamar.
       <strong>Pedido</strong> = o mais recente do cliente na BuyGoods (lido pelo robô, vale por até 24h). ⚠️ = a última mensagem do time foi comentário interno.
+      <strong>✓ respondi</strong> = deixa a linha verde só no seu navegador até o robô ler a fila de novo; se o ticket continuar na lista depois disso, a marca cai.
       🛒 BuyGoods e 🎫 Freshdesk (Open com o cliente esperando). O robô atualiza esta aba de hora em hora (08h–17h).
     </div>`;
 }
