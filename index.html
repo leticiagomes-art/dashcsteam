@@ -1828,21 +1828,26 @@ function renderFila() {
       ${['', 'BuyGoods', 'Freshdesk'].map(v => `<button class="pbtn${filaPlat === v ? ' active' : ''}" onclick="setFilaPlat('${v}')">${v === '' ? 'Todas' : v === 'BuyGoods' ? '🛒 BuyGoods' : '🎫 Freshdesk'}</button>`).join('')}
     </div>
     <div style="overflow-x:auto"><table class="data-table fila-table">
-      <thead><tr><th>Ticket</th><th>Atendente</th><th>Situação</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th><th></th></tr></thead>
+      <thead><tr><th>Ticket</th><th>Helpdesk</th><th>Atendente</th><th>Situação</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th><th></th></tr></thead>
       <tbody>${lista.map((r, i) => {
         const h = Number(r.espera_h), cor = h >= LIM ? '#ff3b30' : h >= LIM - 6 ? '#ff9500' : 'var(--text)';
         const al = [r.problema, r.reembolso].filter(Boolean).join(' · ');
         const ok = resp(r);
+        const hd = `<span class="fila-chip" style="white-space:nowrap;font-weight:700;${r.plataforma === 'Freshdesk' ? 'color:#007aff;border-color:#007aff' : 'color:#ff9500;border-color:#ff9500'}">${r.plataforma === 'Freshdesk' ? '🎫 Freshdesk' : '🛒 BuyGoods'}</span>`;
+        const mc = (r.mesmo_cliente || []).map(m => `${m.plataforma === 'Freshdesk' ? '🎫' : '🛒'} ${filaLink(m.link, m.ticket)} ${m.atendente !== r.atendente ? `<span style="color:#ff9500;font-weight:700">com ${filaEsc(m.atendente)}</span>` : `<span style="color:var(--muted)">(também seu)</span>`}`).join(' · ');
+        const mcLinha = mc ? `<div style="font-size:10px;margin-top:3px;white-space:normal">🔗 mesmo cliente: ${mc}</div>` : '';
         const botao = `<button class="pbtn${ok ? ' active' : ''}" style="padding:3px 10px;font-size:11px;white-space:nowrap;${ok ? 'background:#34c759;border-color:#34c759' : ''}" onclick="filaResp(${i})" title="${ok ? 'desfazer' : 'marca como respondido até a próxima leitura do robô'}">${ok ? '✓ respondido' : '✓ respondi'}</button>`;
         if (ok) return `<tr style="background:rgba(52,199,89,.12)">
-          <td style="white-space:nowrap">${r.plataforma === 'Freshdesk' ? '🎫' : '🛒'} ${filaLink(r.ticket_link, r.ticket)}</td>
+          <td style="white-space:nowrap">${filaLink(r.ticket_link, r.ticket)}</td>
+          <td>${hd}</td>
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}</td>
           <td><span class="fila-chip" style="color:#34c759;border-color:#34c759;font-weight:700">respondido</span></td>
           <td colspan="6" style="color:var(--muted);font-size:11px">o robô confirma na próxima leitura (de hora em hora) e o ticket sai da lista</td>
           <td>${botao}</td>
         </tr>`;
         return `<tr>
-          <td style="white-space:nowrap">${r.plataforma === 'Freshdesk' ? '🎫' : '🛒'} ${filaLink(r.ticket_link, r.ticket)}</td>
+          <td><span style="white-space:nowrap">${filaLink(r.ticket_link, r.ticket)}</span>${mcLinha}</td>
+          <td>${hd}</td>
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}${r.clamado === 'sim' ? '' : ' <span style="color:var(--muted);font-weight:400;font-size:10px">(sem claim)</span>'}</td>
           <td><span class="fila-chip" style="${r.situacao === 'não lido' ? 'color:#af52de;border-color:#af52de' : r.plataforma === 'Freshdesk' ? 'color:#007aff;border-color:#007aff' : ''}">${filaEsc(r.situacao)}</span>${r.comentario_interno ? ' <span title="a última mensagem do time foi comentário interno: o cliente não recebeu">⚠️</span>' : ''}</td>
           <td style="color:${cor};font-weight:${h >= LIM ? 700 : 500};white-space:nowrap">${filaEsc(r.espera)}</td>
@@ -1852,12 +1857,13 @@ function renderFila() {
           <td style="color:var(--muted)">${r.n_pedidos || ''}</td>
           <td style="white-space:nowrap">${r.cliente_link ? filaLink(r.cliente_link, 'ver cliente') : ''}</td>
           <td>${botao}</td>
-        </tr>`; }).join('') || '<tr><td colspan="10" style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
+        </tr>`; }).join('') || '<tr><td colspan="11" style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
     </table></div>
     <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">
       ℹ️ <strong>Como ler:</strong> mais antigo primeiro. <strong>Espera</strong> em horas úteis (seg–sex) desde a última mensagem do cliente; vermelho = acima de 24h.
       <strong>Não lido</strong> = ninguém abriu; <strong>aberto sem resposta</strong> = alguém abriu, mas o cliente não recebeu resposta. "(sem claim)" = parte que o robô deu a essa pessoa para clamar.
       <strong>Pedido</strong> = o mais recente do cliente na BuyGoods (lido pelo robô, vale por até 24h). ⚠️ = a última mensagem do time foi comentário interno.
+      <strong>🔗 mesmo cliente</strong> = o mesmo cliente tem outro ticket esperando (no outro helpdesk ou em outro produto); em laranja, está com outra pessoa: combinem quem responde.
       <strong>✓ respondi</strong> = deixa a linha verde só no seu navegador até o robô ler a fila de novo; se o ticket continuar na lista depois disso, a marca cai.
       🛒 BuyGoods e 🎫 Freshdesk (Open com o cliente esperando). O robô atualiza esta aba de hora em hora (08h–17h).
     </div>`;
