@@ -1851,7 +1851,7 @@ function renderFila() {
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}${r.clamado === 'sim' ? '' : ' <span style="color:var(--muted);font-weight:400;font-size:10px">(sem claim)</span>'}</td>
           <td><span class="fila-chip" style="${r.situacao === 'não lido' ? 'color:#af52de;border-color:#af52de' : r.plataforma === 'Freshdesk' ? 'color:#007aff;border-color:#007aff' : ''}">${filaEsc(r.situacao)}</span>${r.comentario_interno ? ' <span title="a última mensagem do time foi comentário interno: o cliente não recebeu">⚠️</span>' : ''}</td>
           <td style="color:${cor};font-weight:${h >= LIM ? 700 : 500};white-space:nowrap">${filaEsc(r.espera)}</td>
-          <td style="white-space:nowrap;${naoEnv(r) ? 'color:#007aff;font-weight:600' : r.pedido ? '' : 'color:var(--muted)'}">${filaEsc(r.pedido || (r.cliente_link ? '' : 'não achado'))}</td>
+          <td style="white-space:nowrap;${naoEnv(r) ? 'color:#007aff;font-weight:600' : r.pedido ? '' : 'color:var(--muted)'}">${filaEsc(r.pedido || (r.cliente_link ? '' : (r.buscado === false ? 'buscando…' : 'não achado')))}</td>
           <td style="white-space:nowrap">${r.rastreio_link ? filaLink(r.rastreio_link, 'rastrear ' + (r.transportadora || '')) : ''}</td>
           <td style="color:#ff3b30">${filaEsc(al)}</td>
           <td style="color:var(--muted)">${r.n_pedidos || ''}</td>
