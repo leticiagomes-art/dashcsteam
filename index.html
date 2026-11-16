@@ -261,6 +261,7 @@ body {
 .fila-table tr:hover td { background: var(--bg); }
 .fila-table a { color: #007aff; text-decoration: none; font-weight: 600; }
 .fila-table a:hover { text-decoration: underline; }
+.fila-table td.fila-alerta { white-space:normal; min-width:90px; max-width:200px; font-size:11px; line-height:1.35; }
 .fila-chip { display:inline-block; font-size:10px; padding:2px 8px; border-radius:999px; border:1px solid var(--border); white-space:nowrap; }
 .badge {
   display: inline-block; padding: 2px 7px; border-radius: 5px;
@@ -1828,7 +1829,7 @@ function renderFila() {
       ${['', 'BuyGoods', 'Freshdesk'].map(v => `<button class="pbtn${filaPlat === v ? ' active' : ''}" onclick="setFilaPlat('${v}')">${v === '' ? 'Todas' : v === 'BuyGoods' ? '🛒 BuyGoods' : '🎫 Freshdesk'}</button>`).join('')}
     </div>
     <div style="overflow-x:auto"><table class="data-table fila-table">
-      <thead><tr><th>Ticket</th><th>Helpdesk</th><th>Atendente</th><th>Situação</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th><th></th></tr></thead>
+      <thead><tr><th></th><th>Ticket</th><th>Helpdesk</th><th>Atendente</th><th>Espera</th><th>Pedido</th><th>Rastreio</th><th>Alerta</th><th>Pedidos</th><th>Cliente</th></tr></thead>
       <tbody>${lista.map((r, i) => {
         const h = Number(r.espera_h), cor = h >= LIM ? '#ff3b30' : h >= LIM - 6 ? '#ff9500' : 'var(--text)';
         const al = [r.problema, r.reembolso].filter(Boolean).join(' · ');
@@ -1838,30 +1839,28 @@ function renderFila() {
         const mcLinha = mc ? `<div style="font-size:10px;margin-top:3px;white-space:normal">🔗 mesmo cliente: ${mc}</div>` : '';
         const botao = `<button class="pbtn${ok ? ' active' : ''}" style="padding:3px 10px;font-size:11px;white-space:nowrap;${ok ? 'background:#34c759;border-color:#34c759' : ''}" onclick="filaResp(${i})" title="${ok ? 'desfazer' : 'marca como respondido até a próxima leitura do robô'}">${ok ? '✓ respondido' : '✓ respondi'}</button>`;
         if (ok) return `<tr style="background:rgba(52,199,89,.12)">
+          <td>${botao}</td>
           <td style="white-space:nowrap">${filaLink(r.ticket_link, r.ticket)}</td>
           <td>${hd}</td>
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}</td>
-          <td><span class="fila-chip" style="color:#34c759;border-color:#34c759;font-weight:700">respondido</span></td>
           <td colspan="6" style="color:var(--muted);font-size:11px">o robô confirma na próxima leitura (de hora em hora) e o ticket sai da lista</td>
-          <td>${botao}</td>
         </tr>`;
         return `<tr>
-          <td><span style="white-space:nowrap">${filaLink(r.ticket_link, r.ticket)}</span>${mcLinha}</td>
+          <td>${botao}</td>
+          <td><span style="white-space:nowrap">${filaLink(r.ticket_link, r.ticket)}${r.comentario_interno ? ' <span title="a última mensagem do time foi comentário interno: o cliente não recebeu">⚠️</span>' : ''}</span>${mcLinha}</td>
           <td>${hd}</td>
           <td style="color:${agColor(r.atendente)};font-weight:600;white-space:nowrap">${filaEsc(r.atendente)}${r.clamado === 'sim' ? '' : ' <span style="color:var(--muted);font-weight:400;font-size:10px">(sem claim)</span>'}</td>
-          <td><span class="fila-chip" style="${r.situacao === 'não lido' ? 'color:#af52de;border-color:#af52de' : r.plataforma === 'Freshdesk' ? 'color:#007aff;border-color:#007aff' : ''}">${filaEsc(r.situacao)}</span>${r.comentario_interno ? ' <span title="a última mensagem do time foi comentário interno: o cliente não recebeu">⚠️</span>' : ''}</td>
           <td style="color:${cor};font-weight:${h >= LIM ? 700 : 500};white-space:nowrap">${filaEsc(r.espera)}</td>
           <td style="white-space:nowrap;${naoEnv(r) ? 'color:#007aff;font-weight:600' : r.pedido ? '' : 'color:var(--muted)'}">${filaEsc(r.pedido || (r.cliente_link ? '' : (r.buscado === false ? 'buscando…' : 'não achado')))}</td>
           <td style="white-space:nowrap">${r.rastreio_link ? filaLink(r.rastreio_link, 'rastrear ' + (r.transportadora || '')) : ''}</td>
-          <td style="color:#ff3b30">${filaEsc(al)}</td>
+          <td class="fila-alerta" style="color:#ff3b30">${filaEsc(al)}</td>
           <td style="color:var(--muted)">${r.n_pedidos || ''}</td>
           <td style="white-space:nowrap">${r.cliente_link ? filaLink(r.cliente_link, 'ver cliente') : ''}</td>
-          <td>${botao}</td>
-        </tr>`; }).join('') || '<tr><td colspan="11" style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
+        </tr>`; }).join('') || '<tr><td colspan="10"style="color:var(--muted)">Nenhum ticket esperando resposta 🎉</td></tr>'}</tbody>
     </table></div>
     <div style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5">
       ℹ️ <strong>Como ler:</strong> mais antigo primeiro. <strong>Espera</strong> em horas úteis (seg–sex) desde a última mensagem do cliente; vermelho = acima de 24h.
-      <strong>Não lido</strong> = ninguém abriu; <strong>aberto sem resposta</strong> = alguém abriu, mas o cliente não recebeu resposta. "(sem claim)" = parte que o robô deu a essa pessoa para clamar.
+      "(sem claim)" = parte que o robô deu a essa pessoa para clamar.
       <strong>Pedido</strong> = o mais recente do cliente na BuyGoods (lido pelo robô, vale por até 24h). ⚠️ = a última mensagem do time foi comentário interno.
       <strong>🔗 mesmo cliente</strong> = o mesmo cliente tem outro ticket esperando (no outro helpdesk ou em outro produto); em laranja, está com outra pessoa: combinem quem responde.
       <strong>✓ respondi</strong> = deixa a linha verde só no seu navegador até o robô ler a fila de novo; se o ticket continuar na lista depois disso, a marca cai.
