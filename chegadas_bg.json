@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-12 08:48",
+ "atualizado_em": "2026-11-17 07:20",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -509,6 +509,21 @@
     "Visium Pro"
    ],
    "produtos": {}
+  },
+  "2026-11-15": {
+   "lido_em": "2026-11-17 07:20",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "AlphaErec": 2,
+    "Audileaf": 1,
+    "BreathEaseX": 4,
+    "BullSodaRise": 1,
+    "FloraNew": 1,
+    "Marobrain": 5,
+    "SodaHorsePeak": 1,
+    "Vigorlong": 1
+   }
   }
  }
 }
