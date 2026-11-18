@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-18 07:42",
+ "atualizado_em": "2026-11-18 07:57",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -543,6 +543,20 @@
     "PressureCalmX": 2,
     "SodaHorsePeak": 8,
     "Visium Pro": 1
+   }
+  },
+  "2026-11-17": {
+   "lido_em": "2026-11-18 07:57",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "AlphaErec": 1,
+    "Audileaf": 1,
+    "BreathEaseX": 1,
+    "Marobrain": 5,
+    "Nervolyn": 1,
+    "PressureCalmX": 1,
+    "SodaHorsePeak": 1
    }
   }
  }
