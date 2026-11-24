@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-24 07:15",
+ "atualizado_em": "2026-11-24 07:29",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -633,6 +633,22 @@
     "NailsCleanPro": 6,
     "Nervolyn": 2,
     "PressureCalmX": 1
+   }
+  },
+  "2026-11-23": {
+   "lido_em": "2026-11-24 07:29",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "BakingSlim": 6,
+    "BreathEaseX": 2,
+    "DM Gummies": 1,
+    "FloraNew": 1,
+    "Marobrain": 5,
+    "NailsCleanPro": 8,
+    "Nervolyn": 1,
+    "PressureCalmX": 1,
+    "SodaHorsePeak": 3
    }
   }
  }
