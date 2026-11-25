@@ -1,5 +1,5 @@
 {
- "atualizado_em": "2026-11-25 07:18",
+ "atualizado_em": "2026-11-25 07:33",
  "fonte": "contagens do helpdesk BuyGoods",
  "dias": {
   "2026-10-06": {
@@ -652,6 +652,19 @@
     "PressureCalmX": 3,
     "SodaHorsePeak": 2,
     "VapoMend": 1
+   }
+  },
+  "2026-11-24": {
+   "lido_em": "2026-11-25 07:33",
+   "origem": "robô",
+   "sem_leitura": [],
+   "produtos": {
+    "BreathEaseX": 1,
+    "Marobrain": 4,
+    "NailsCleanPro": 4,
+    "Prostafense": 2,
+    "SodaHorsePeak": 3,
+    "Visium Pro": 3
    }
   }
  }
